@@ -9,7 +9,8 @@ import java.util.Date;
 public class CalendarApp extends JFrame {
     private JLabel monthLabel;
     private JPanel calendarPanel;
-
+    private JPanel inputPanel;
+    
     private Calendar currentMonth;
 
     public CalendarApp() {
@@ -39,9 +40,13 @@ public class CalendarApp extends JFrame {
         calendarPanel = new JPanel(new GridLayout(6, 7));
         updateCalendar();
         container.add(calendarPanel, BorderLayout.CENTER);
+        
+        // Input Panel
+        inputPanel = new JPanel();
 
         // Buttons for navigation
         JButton prevButton = new JButton("<< Prev");
+        JButton addButton = new JButton("Add Event");
         JButton nextButton = new JButton("Next >>");
 
         prevButton.addActionListener(new ActionListener() {
@@ -50,6 +55,13 @@ public class CalendarApp extends JFrame {
                 currentMonth.add(Calendar.MONTH, -1);
                 updateMonthLabel();
                 updateCalendar();
+            }
+        });
+        
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateInput();
             }
         });
 
@@ -64,6 +76,7 @@ public class CalendarApp extends JFrame {
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(prevButton);
+        buttonPanel.add(addButton);
         buttonPanel.add(nextButton);
         container.add(buttonPanel, BorderLayout.SOUTH);
     }
@@ -71,6 +84,38 @@ public class CalendarApp extends JFrame {
     private void updateMonthLabel() {
         SimpleDateFormat sdf = new SimpleDateFormat("MMMM yyyy");
         monthLabel.setText(sdf.format(currentMonth.getTime()));
+    }
+    
+    private void updateInput() {
+        JTextField dayField = new JTextField();
+        JTextField eventField = new JTextField();
+
+        JPanel inputPanel = new JPanel(new GridLayout(2, 2));
+        inputPanel.add(new JLabel("Day (1-31):"));
+        inputPanel.add(dayField);
+        inputPanel.add(new JLabel("Event:"));
+        inputPanel.add(eventField);
+        
+        int result = JOptionPane.showConfirmDialog(null, inputPanel,
+                "Add Event", JOptionPane.OK_CANCEL_OPTION);
+
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                int day = Integer.parseInt(dayField.getText());
+                String event = eventField.getText();
+
+                if (day < 1 || day > 31) {
+                    JOptionPane.showMessageDialog(null, "Invalid day. Please enter a day between 1 and 31.");
+                    return;
+                }
+                
+                JOptionPane.showMessageDialog(null, "Event added successfully!");
+            } 
+            
+            catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(null, "Invalid input. Please enter a valid number for the day.");
+            }
+        }
     }
 
     private void updateCalendar() {
