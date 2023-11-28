@@ -9,7 +9,8 @@ public class BarGraph extends JFrame {
 
    public BarGraph(Map<String, Integer> data) {
    
-      setSize(1200, 1000);
+      setSize(1200, 600);
+      setResizable(false);
       setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
    
       BarChartPanel chartPanel = new BarChartPanel(data);
@@ -24,7 +25,7 @@ public class BarGraph extends JFrame {
       data.put("Wednesday", 3);
       data.put("Thursday", 4);
       data.put("Friday", 1);
-      data.put("Saturday", 14);
+      data.put("Saturday", 12);
       data.put("Sunday", 10);
    
       SwingUtilities.invokeLater(() -> { BarGraph barGraph = new BarGraph(data); barGraph.setVisible(true);});
@@ -59,7 +60,7 @@ class BarChartPanel extends JPanel {
       g.setColor(Color.BLACK);
    
       for (int i = 0; i <= maxValue; i++) {
-         g.drawString(Integer.toString(i), startX - 30, startY - (i * 30));
+         g.drawString(Integer.toString(i), startX - 30, startY - (i * (50/maxValue)));
       }
    
       g.setColor(Color.blue);
@@ -76,7 +77,6 @@ class BarChartPanel extends JPanel {
          int labelX = x + barWidth / 2 - g.getFontMetrics().stringWidth(category) / 2;
          g.drawString(category, labelX, startY + 15);
       
-         g.drawString(Integer.toString(value), startX - 30, startY - barHeight + barHeight / 2);
          x += barWidth + barGap;
          g.setColor(Color.blue);
       }
