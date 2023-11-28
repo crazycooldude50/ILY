@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.awt.geom.AffineTransform;
 
 public class BarGraph extends JFrame {
 
@@ -9,7 +10,7 @@ public class BarGraph extends JFrame {
 
    public BarGraph(Map<String, Integer> data) {
    
-      setSize(1100, 600);
+      setSize(1500, 600);
       setResizable(false);
       setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
    
@@ -45,7 +46,7 @@ class BarChartPanel extends JPanel {
    
       int barWidth = 100;
       int barGap = 40;
-      int startX = 50;
+      int startX = 100;
       int endX = getWidth() - 50;
       int startY = getHeight() - 50;
       int endY = 50;
@@ -76,14 +77,24 @@ class BarChartPanel extends JPanel {
    public void Axes(Graphics g, int startX, int endX, int startY, int endY, int maxValue) {
       g.drawLine(startX, startY, endX, startY);
       g.drawLine(startX, startY, startX, endY - 25);
-      g.setColor(Color.RED);
+      
       Font basicFont = new Font(g.getFont().getFontName(), Font.PLAIN, 12);
       Font axisLabelFont = new Font(g.getFont().getFontName(), Font.PLAIN, 18);
+      
+      g.setColor(Color.RED);
+      
       g.setFont(axisLabelFont);
       g.drawString("Day", startX + ((endX - startX) / 2), startY + 40);
+     
+      AffineTransform affineTransform = new AffineTransform();
+      affineTransform.rotate(-Math.PI / 2, 0, 0);
+      Font rotatedFont = basicFont.deriveFont(affineTransform);
+      g.setFont(rotatedFont);
       g.drawString("Events", startX - 40, endY - 30);
       g.setFont(basicFont);
+      
       g.setColor(Color.BLACK);
+      
       for (int i = 0; i <= maxValue; i++) {
          g.drawString(Integer.toString(i), startX - 30, startY - (i * ((startY-endY)/maxValue)));
       }
