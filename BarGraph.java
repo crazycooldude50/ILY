@@ -9,7 +9,7 @@ public class BarGraph extends JFrame {
 
    public BarGraph(Map<String, Integer> data) {
    
-      setSize(1200, 600);
+      setSize(1100, 600);
       setResizable(false);
       setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
    
@@ -52,16 +52,7 @@ class BarChartPanel extends JPanel {
    
       int maxValue = data.values().stream().max(Integer::compare).orElse(0);
    
-      g.drawLine(startX, startY, endX, startY);
-      g.drawLine(startX, startY, startX, endY);
-      g.setColor(Color.RED);
-      g.drawString("Day", endX - 25, startY + 20);
-      g.drawString("Events", startX - 40, endY - 20);
-      g.setColor(Color.BLACK);
-      
-      for (int i = 0; i <= maxValue; i++) {
-         g.drawString(Integer.toString(i), startX - 30, startY - (i * ((startY-endY)/maxValue)));
-      }
+      Axes(g, startX, endX, startY, endY, maxValue);
    
       g.setColor(Color.blue);
       int x = startX + barGap;
@@ -76,9 +67,25 @@ class BarChartPanel extends JPanel {
       
          int labelX = x + barWidth / 2 - g.getFontMetrics().stringWidth(category) / 2;
          g.drawString(category, labelX, startY + 15);
-      
+         
          x += barWidth + barGap;
          g.setColor(Color.blue);
+      }
+   }
+  
+   public void Axes(Graphics g, int startX, int endX, int startY, int endY, int maxValue) {
+      g.drawLine(startX, startY, endX, startY);
+      g.drawLine(startX, startY, startX, endY - 25);
+      g.setColor(Color.RED);
+      Font basicFont = new Font(g.getFont().getFontName(), Font.PLAIN, 12);
+      Font axisLabelFont = new Font(g.getFont().getFontName(), Font.PLAIN, 18);
+      g.setFont(axisLabelFont);
+      g.drawString("Day", startX + ((endX - startX) / 2), startY + 40);
+      g.drawString("Events", startX - 40, endY - 30);
+      g.setFont(basicFont);
+      g.setColor(Color.BLACK);
+      for (int i = 0; i <= maxValue; i++) {
+         g.drawString(Integer.toString(i), startX - 30, startY - (i * ((startY-endY)/maxValue)));
       }
    }
 }
