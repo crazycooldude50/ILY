@@ -6,11 +6,19 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class CalendarApp extends JFrame {
     private JLabel monthLabel;
     private JPanel calendarPanel;
     private JPanel inputPanel;
+    private JPanel barGraphPanel;
+    private String barGraphInput;
+    
+    // amount of events in a day count (all bar graph)
+    private int count = 0;
+    private Map<String, Integer> currentMap = new LinkedHashMap<>();
     
     private Calendar currentMonth;
 
@@ -35,7 +43,7 @@ public class CalendarApp extends JFrame {
         monthLabel = new JLabel();
         monthLabel.setHorizontalAlignment(SwingConstants.CENTER);
         updateMonthLabel();
-        container.add(monthLabel, BorderLayout.NORTH);
+        container.add(monthLabel, BorderLayout.NORTH);        
 
         // Calendar Panel
         calendarPanel = new JPanel(new GridLayout(6, 7));
@@ -44,10 +52,14 @@ public class CalendarApp extends JFrame {
         
         // Input Panel
         inputPanel = new JPanel();
+        
+        // Bar Graph Panel
+        barGraphPanel = new JPanel();
 
         // Buttons for navigation
         JButton prevButton = new JButton("<< Prev");
         JButton addButton = new JButton("Add Event");
+        JButton barGraphButton = new JButton("Bar Graph");
         JButton nextButton = new JButton("Next >>");
 
         prevButton.addActionListener(new ActionListener() {
@@ -65,6 +77,14 @@ public class CalendarApp extends JFrame {
                 updateInput();
             }
         });
+        
+        barGraphButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateBarGraph();
+                openBarGraph();
+            }
+        });
 
         nextButton.addActionListener(new ActionListener() {
             @Override
@@ -78,6 +98,7 @@ public class CalendarApp extends JFrame {
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(prevButton);
         buttonPanel.add(addButton);
+        buttonPanel.add(barGraphButton);
         buttonPanel.add(nextButton);
         container.add(buttonPanel, BorderLayout.SOUTH);
     }
@@ -85,6 +106,28 @@ public class CalendarApp extends JFrame {
     private void updateMonthLabel() {
         SimpleDateFormat sdf = new SimpleDateFormat("MMMM yyyy");
         monthLabel.setText(sdf.format(currentMonth.getTime()));
+    }
+    
+    private void openBarGraph() {   
+        if (count >= 1) {
+            updateBarGraph();
+            SwingUtilities.invokeLater(() -> { BarGraph barGraph = new BarGraph(currentMap); barGraph.setVisible(true);});
+        }
+        else if (count = null) {
+            JOptionPane.showMessageDialog(null, "There are no events for this month.");
+            updateCalendar();
+        }
+    }
+    
+    private void updateBarGraph() {        
+        currentMap.put(barGraphInput, count++);
+        for (Map.Entry<String, Integer> entry : currentMap.entrySet()) {
+            String key = entry.getKey();
+            Integer value = entry.getValue();
+
+            // Print key-value pairs
+            System.out.println("Key: " + key + ", Value: " + value);
+        }
     }
     
     private void updateInput() {
@@ -112,17 +155,17 @@ public class CalendarApp extends JFrame {
         inputPanel.add(new JLabel("Title:"));
         inputPanel.add(title);
         inputPanel.add(new JLabel("All-Day:"));
-        inputPanel.add(allDay);
+        inputPanel.add(allDay);        
         
         int result = JOptionPane.showConfirmDialog(null, inputPanel,
                 "New Event", JOptionPane.OK_CANCEL_OPTION);
-        
-        
         
         // !Null input check
         if (result == JOptionPane.OK_OPTION) {
             try {                
                 JOptionPane.showMessageDialog(null, "Event added successfully!");
+                barGraphInput = title.getText();
+                updateBarGraph();
             } 
             
             catch (NumberFormatException ex) {
@@ -172,7 +215,7 @@ public class CalendarApp extends JFrame {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) {       
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
