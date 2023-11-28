@@ -55,12 +55,12 @@ class BarChartPanel extends JPanel {
       g.drawLine(startX, startY, endX, startY);
       g.drawLine(startX, startY, startX, endY);
       g.setColor(Color.RED);
-      g.drawString("Day", endX - 50, startY + 20);
-      g.drawString("Events", startX - 40, endY + 20);
+      g.drawString("Day", endX - 25, startY + 20);
+      g.drawString("Events", startX - 40, endY - 20);
       g.setColor(Color.BLACK);
-   
+      
       for (int i = 0; i <= maxValue; i++) {
-         g.drawString(Integer.toString(i), startX - 30, startY - (i * (50/maxValue)));
+         g.drawString(Integer.toString(i), startX - 30, startY - (i * ((startY-endY)/maxValue)));
       }
    
       g.setColor(Color.blue);
@@ -74,7 +74,7 @@ class BarChartPanel extends JPanel {
          g.fillRect(x, startY - barHeight, barWidth, barHeight);
          g.setColor(Color.black);
       
-         int labelX = x + barWidth / 2 - g.getFontMetrics().stringWidth(category) / 2;
+         int labelX = x + barWidth / 2 - g.getFontMetrics().stringWidth(category) / 2; // ChatGPTed, does it look too sus?
          g.drawString(category, labelX, startY + 15);
       
          x += barWidth + barGap;
