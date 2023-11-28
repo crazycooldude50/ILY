@@ -74,7 +74,7 @@ class BarChartPanel extends JPanel {
          g.fillRect(x, startY - barHeight, barWidth, barHeight);
          g.setColor(Color.black);
       
-         int labelX = x + barWidth / 2 - g.getFontMetrics().stringWidth(category) / 2; // ChatGPTed, does it look too sus?
+         int labelX = x + barWidth / 2 - g.getFontMetrics().stringWidth(category) / 2;
          g.drawString(category, labelX, startY + 15);
       
          x += barWidth + barGap;
