@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 public class CalendarApp extends JFrame {
     private JLabel monthLabel;
@@ -87,28 +88,40 @@ public class CalendarApp extends JFrame {
     }
     
     private void updateInput() {
-        JTextField dayField = new JTextField();
-        JTextField eventField = new JTextField();
+        JTextField title = new JTextField();
+        JToggleButton allDay = new JToggleButton("False");
+        //J starts = new J();
+        //J ends = new J();
+        //J repeat = new J();
+        
+        allDay.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (allDay.isSelected()) {
+                    allDay.setText("True");
+                } else {
+                    allDay.setText("False");
+                }
+            }
+        });
 
-        JPanel inputPanel = new JPanel(new GridLayout(2, 2));
-        inputPanel.add(new JLabel("Day (1-31):"));
-        inputPanel.add(dayField);
-        inputPanel.add(new JLabel("Event:"));
-        inputPanel.add(eventField);
+        JPanel inputPanel = new JPanel(new GridLayout(3, 2));
+        inputPanel.add(new JLabel("Day: " + currentMonth.get(Calendar.DAY_OF_WEEK)));
+        inputPanel.add(new JLabel("Month: " +
+                                  currentMonth.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH)));
+        inputPanel.add(new JLabel("Title:"));
+        inputPanel.add(title);
+        inputPanel.add(new JLabel("All-Day:"));
+        inputPanel.add(allDay);
         
         int result = JOptionPane.showConfirmDialog(null, inputPanel,
-                "Add Event", JOptionPane.OK_CANCEL_OPTION);
-
+                "New Event", JOptionPane.OK_CANCEL_OPTION);
+        
+        
+        
+        // !Null input check
         if (result == JOptionPane.OK_OPTION) {
-            try {
-                int day = Integer.parseInt(dayField.getText());
-                String event = eventField.getText();
-
-                if (day < 1 || day > 31) {
-                    JOptionPane.showMessageDialog(null, "Invalid day. Please enter a day between 1 and 31.");
-                    return;
-                }
-                
+            try {                
                 JOptionPane.showMessageDialog(null, "Event added successfully!");
             } 
             
@@ -155,7 +168,7 @@ public class CalendarApp extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            JOptionPane.showMessageDialog(CalendarApp.this, "You clicked on day " + day);
+            updateInput();
         }
     }
 
