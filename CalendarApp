@@ -15,11 +15,19 @@ public class CalendarApp extends JFrame {
     private JPanel inputPanel;
     private JPanel barGraphPanel;
     private JPanel showEventsPanel;
+    
+    // Specified Variables
     private String barGraphInput;
+    private int specifiedDay;
+    private int specifiedMonth;
+    
+    // Day clicked
+    private int dayClicked;
     
     // amount of events in a day count (all bar graph)
     private int count = 0;
     private Map<String, Integer> currentMap = new LinkedHashMap<>();
+    private Map<Integer, Integer> currentMap1 = new LinkedHashMap<>();
     
     private Calendar currentMonth;
 
@@ -124,20 +132,30 @@ public class CalendarApp extends JFrame {
     
     private void updateBarGraph() {        
         currentMap.put(barGraphInput, count++);
+        currentMap1.put(specifiedDay, specifiedMonth);
+        
         for (Map.Entry<String, Integer> entry : currentMap.entrySet()) {
             String key = entry.getKey();
             Integer value = entry.getValue();
 
             // Print key-value pairs
-            System.out.println("Key: " + key + ", Day: " + value);
+            System.out.print("Title: " + key + ", Count: " + value);
+        }
+        for (Map.Entry<Integer, Integer> entry : currentMap1.entrySet()) {
+            Integer key = entry.getKey();
+            Integer value = entry.getValue();
+
+            // Print key-value pairs
+            System.out.println(", Day: " + key + ", Month: " + value);
         }
     }
     
+    // Show Events :-)
     private void showEvents() {
         if (count >= 1) {
             JPanel showEventsPanel = new JPanel(new GridLayout(count, 1));
             for (String a : currentMap.keySet()) {
-                 showEventsPanel.add(new JLabel(currentMap.get(a)));
+                 showEventsPanel.add(new JLabel(a));
             }
         }
         else {
@@ -151,9 +169,6 @@ public class CalendarApp extends JFrame {
         JTextField day = new JTextField();
         JTextField month = new JTextField();
         JToggleButton allDay = new JToggleButton("False");
-        //J starts = new J();
-        //J ends = new J();
-        //J repeat = new J();
         
         allDay.addActionListener(new ActionListener() {
             @Override
@@ -184,6 +199,8 @@ public class CalendarApp extends JFrame {
             try {                
                 JOptionPane.showMessageDialog(null, "Event added successfully!");
                 barGraphInput = title.getText();
+                specifiedDay = Integer.parseInt(day.getText());
+                specifiedMonth = Integer.parseInt(month.getText());
                 updateBarGraph();
             } 
             
