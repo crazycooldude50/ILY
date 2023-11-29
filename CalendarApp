@@ -14,6 +14,7 @@ public class CalendarApp extends JFrame {
     private JPanel calendarPanel;
     private JPanel inputPanel;
     private JPanel barGraphPanel;
+    private JPanel showEventsPanel;
     private String barGraphInput;
     
     // amount of events in a day count (all bar graph)
@@ -55,6 +56,9 @@ public class CalendarApp extends JFrame {
         
         // Bar Graph Panel
         barGraphPanel = new JPanel();
+        
+        // Show Events Panel
+        showEventsPanel = new JPanel();
 
         // Buttons for navigation
         JButton prevButton = new JButton("<< Prev");
@@ -125,7 +129,20 @@ public class CalendarApp extends JFrame {
             Integer value = entry.getValue();
 
             // Print key-value pairs
-            System.out.println("Key: " + key + ", Value: " + value);
+            System.out.println("Key: " + key + ", Day: " + value);
+        }
+    }
+    
+    private void showEvents() {
+        if (count >= 1) {
+            JPanel showEventsPanel = new JPanel(new GridLayout(count, 1));
+            for (String a : currentMap.keySet()) {
+                 showEventsPanel.add(new JLabel(currentMap.get(a)));
+            }
+        }
+        else {
+            JOptionPane.showMessageDialog(null, "There are no events for this month.");
+            updateCalendar();
         }
     }
     
@@ -157,7 +174,7 @@ public class CalendarApp extends JFrame {
         inputPanel.add(new JLabel("Title: "));
         inputPanel.add(title);
         inputPanel.add(new JLabel("All-Day: "));
-        inputPanel.add(allDay);        
+        inputPanel.add(allDay);
         
         int result = JOptionPane.showConfirmDialog(null, inputPanel,
                 "New Event", JOptionPane.OK_CANCEL_OPTION);
@@ -213,7 +230,7 @@ public class CalendarApp extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            updateInput();
+            showEvents();
         }
     }
 
