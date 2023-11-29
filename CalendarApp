@@ -140,6 +140,9 @@ public class CalendarApp extends JFrame {
 
             // Print key-value pairs
             System.out.print("Title: " + key + ", Count: " + value);
+            
+            // send to calendar
+            updateCalendar();
         }
         for (Map.Entry<Integer, Integer> entry : currentMap1.entrySet()) {
             Integer key = entry.getKey();
@@ -155,6 +158,7 @@ public class CalendarApp extends JFrame {
         if (count >= 1) {
             JPanel showEventsPanel = new JPanel(new GridLayout(count, 1));
             for (String a : currentMap.keySet()) {
+                 for (//every day in the month, find whichever day corresponds to day clicked and then print out whatever was saved in the day clicked
                  showEventsPanel.add(new JLabel(a));
             }
         }
@@ -247,6 +251,7 @@ public class CalendarApp extends JFrame {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            dayClicked = day;
             showEvents();
         }
     }
