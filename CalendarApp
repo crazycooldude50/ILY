@@ -158,8 +158,9 @@ public class CalendarApp extends JFrame {
         if (count >= 1) {
             JPanel showEventsPanel = new JPanel(new GridLayout(count, 1));
             for (String a : currentMap.keySet()) {
-                 for (//every day in the month, find whichever day corresponds to day clicked and then print out whatever was saved in the day clicked
-                 showEventsPanel.add(new JLabel(a));
+                 for //search through every day in the month, find whichever day corresponds to day clicked and then print out whatever was saved in the day clicked
+                     if (day = dayClicked)
+                           showEventsPanel.add(new JLabel(a));
             }
         }
         else {
@@ -252,6 +253,7 @@ public class CalendarApp extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             dayClicked = day;
+            System.out.print(dayClicked);
             showEvents();
         }
     }
