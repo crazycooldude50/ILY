@@ -10,260 +10,287 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class CalendarApp extends JFrame {
-    private JLabel monthLabel;
-    private JPanel calendarPanel;
-    private JPanel inputPanel;
-    private JPanel barGraphPanel;
-    private JPanel showEventsPanel;
-    
-    // Specified Variables
-    private String barGraphInput;
-    private int specifiedDay;
-    private int specifiedMonth;
-    
-    // Day clicked
-    private int dayClicked;
-    
-    // amount of events in a day count (all bar graph)
-    private int count = 0;
-    private Map<String, Integer> currentMap = new LinkedHashMap<>();
-    private Map<Integer, Integer> currentMap1 = new LinkedHashMap<>();
-    
-    private Calendar currentMonth;
+   private JLabel monthLabel;
+   private JPanel calendarPanel;
+   private JPanel inputPanel;
+   private JPanel barGraphPanel;
+   private JPanel showEventsPanel;
+   
+   // Specified Variables
+   private String barGraphInput;
+   private int specifiedDay;
+   private int specifiedMonth;
+   
+   // Day clicked
+   private int dayClicked;
+   
+   // amount of events in a day count (all bar graph)
+   private int count = 0;
+   private Map<String, Integer> currentMap = new LinkedHashMap<>();
+   private Map<Integer, Integer> currentMap1 = new LinkedHashMap<>();
+   
+   private Calendar currentMonth;
+   
+   private String[] daysOfWeek = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+   
+   public CalendarApp() {
+      currentMonth = Calendar.getInstance();
+   
+      setTitle("Java Calendar");
+      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      setSize(400, 300);
+      setLocationRelativeTo(null);
+   
+      createGUI();
+   
+      setVisible(true);
+   }
 
-    public CalendarApp() {
-        currentMonth = Calendar.getInstance();
+   private void createGUI() {
+      Container container = getContentPane();
+      container.setLayout(new BorderLayout());
+   
+      // Month Label
+      monthLabel = new JLabel();
+      monthLabel.setHorizontalAlignment(SwingConstants.CENTER);
+      updateMonthLabel();
+      container.add(monthLabel, BorderLayout.NORTH);        
+   
+      // Calendar Panel
+      calendarPanel = new JPanel(new GridLayout(6, 7));
+      updateCalendar();
+      container.add(calendarPanel, BorderLayout.CENTER);
+      
+      // Input Panel
+      inputPanel = new JPanel();
+      
+      // Bar Graph Panel
+      barGraphPanel = new JPanel();
+      
+      // Show Events Panel
+      showEventsPanel = new JPanel();
+   
+      // Buttons for navigation
+      JButton prevButton = new JButton("<< Prev");
+      JButton addButton = new JButton("Add Event");
+      JButton barGraphButton = new JButton("Bar Graph");
+      JButton nextButton = new JButton("Next >>");
+   
+      prevButton.addActionListener(
+         new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               currentMonth.add(Calendar.MONTH, -1);
+               updateMonthLabel();
+               updateCalendar();
+            }
+         });
+      
+      addButton.addActionListener(
+         new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               updateInput();
+            }
+         });
+      
+      barGraphButton.addActionListener(
+         new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               openBarGraph();
+            }
+         });
+   
+      nextButton.addActionListener(
+         new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               currentMonth.add(Calendar.MONTH, 1);
+               updateMonthLabel();
+               updateCalendar();
+            }
+         });
+   
+      JPanel buttonPanel = new JPanel();
+      buttonPanel.add(prevButton);
+      buttonPanel.add(addButton);
+      buttonPanel.add(barGraphButton);
+      buttonPanel.add(nextButton);
+      container.add(buttonPanel, BorderLayout.SOUTH);
+   }
 
-        setTitle("Java Calendar");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(400, 300);
-        setLocationRelativeTo(null);
+   private void updateMonthLabel() {
+      SimpleDateFormat sdf = new SimpleDateFormat("MMMM yyyy");
+      monthLabel.setText(sdf.format(currentMonth.getTime()));
+   }
+   
+private void openBarGraph() {
+    if (count >= 1) {
+        // Use the current month and year
+        Calendar calendar = Calendar.getInstance();
+        
+        String dateString = JOptionPane.showInputDialog("Enter a day of the month:");
+        try {
+            int selectedDay = Integer.parseInt(dateString);
 
-        createGUI();
+            // Set the selected day in the current month and year
+            calendar.set(Calendar.DAY_OF_MONTH, selectedDay);
 
-        setVisible(true);
-    }
+            // Calculate the start day (Monday) and end day (Sunday) of the week
+            int dayOfWeekIndex = calendar.get(Calendar.DAY_OF_WEEK) - 2;
+            int startDay = selectedDay - dayOfWeekIndex;
 
-    private void createGUI() {
-        Container container = getContentPane();
-        container.setLayout(new BorderLayout());
+            // Adjust for the first week of the month
+            startDay = Math.max(1, startDay);
 
-        // Month Label
-        monthLabel = new JLabel();
-        monthLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        updateMonthLabel();
-        container.add(monthLabel, BorderLayout.NORTH);        
-
-        // Calendar Panel
-        calendarPanel = new JPanel(new GridLayout(6, 7));
+            // Store each date from the first day to the seventh in an array
+            String[] selectedWeekDates = new String[7];
+            for (int i = 0; i < 7; i++) {
+                selectedWeekDates[i] = String.valueOf(startDay + i);
+            }
+        }
+        
+        catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Invalid input. Please enter a valid number for the day.");
+        }
+    } 
+    else {
+        JOptionPane.showMessageDialog(null, "There are no events for this month.");
         updateCalendar();
-        container.add(calendarPanel, BorderLayout.CENTER);
-        
-        // Input Panel
-        inputPanel = new JPanel();
-        
-        // Bar Graph Panel
-        barGraphPanel = new JPanel();
-        
-        // Show Events Panel
-        showEventsPanel = new JPanel();
-
-        // Buttons for navigation
-        JButton prevButton = new JButton("<< Prev");
-        JButton addButton = new JButton("Add Event");
-        JButton barGraphButton = new JButton("Bar Graph");
-        JButton nextButton = new JButton("Next >>");
-
-        prevButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                currentMonth.add(Calendar.MONTH, -1);
-                updateMonthLabel();
-                updateCalendar();
-            }
-        });
-        
-        addButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateInput();
-            }
-        });
-        
-        barGraphButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                openBarGraph();
-            }
-        });
-
-        nextButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                currentMonth.add(Calendar.MONTH, 1);
-                updateMonthLabel();
-                updateCalendar();
-            }
-        });
-
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(prevButton);
-        buttonPanel.add(addButton);
-        buttonPanel.add(barGraphButton);
-        buttonPanel.add(nextButton);
-        container.add(buttonPanel, BorderLayout.SOUTH);
     }
+}
 
-    private void updateMonthLabel() {
-        SimpleDateFormat sdf = new SimpleDateFormat("MMMM yyyy");
-        monthLabel.setText(sdf.format(currentMonth.getTime()));
-    }
-    
-    private void openBarGraph() {   
-        if (count >= 1) {
+   
+   private void updateBarGraph() {
+      for (int i = 0; i < daysOfWeek.length; i++) {         
+         currentMap.put(daysOfWeek[i], count++);
+      }
+      currentMap1.put(specifiedDay, specifiedMonth);
+      
+      for (Map.Entry<String, Integer> entry : currentMap.entrySet()) {
+         String key = entry.getKey();
+         Integer value = entry.getValue();
+      
+         // Print key-value pairs
+         System.out.print("Title: " + key + ", Count: " + value);
+      }
+      for (Map.Entry<Integer, Integer> entry : currentMap1.entrySet()) {
+         Integer key = entry.getKey();
+         Integer value = entry.getValue();
+      
+         // Print key-value pairs
+         System.out.println(", Day: " + key + ", Month: " + value);
+      }
+   }
+   
+   // Show Events :-)
+   private void showEvents() {
+      if (count >= 1) {
+         JPanel showEventsPanel = new JPanel(new GridLayout(count, 1));
+         for (String a : currentMap.keySet()) {
+            showEventsPanel.add(new JLabel(a));
+         }
+      }
+      else {
+         JOptionPane.showMessageDialog(null, "There are no events for this month.");
+         updateCalendar();
+      }
+   }
+   
+   private void updateInput() {
+      JTextField title = new JTextField();
+      JTextField day = new JTextField();
+      JTextField month = new JTextField();
+      JToggleButton allDay = new JToggleButton("False");
+      
+      allDay.addActionListener(
+         new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               if (allDay.isSelected()) {
+                  allDay.setText("True");
+               } else {
+                  allDay.setText("False");
+               }
+            }
+         });
+   
+      JPanel inputPanel = new JPanel(new GridLayout(5, 2));
+      inputPanel.add(new JLabel("Day: "));
+      inputPanel.add(day);
+      inputPanel.add(new JLabel("Month: "));
+      inputPanel.add(month);
+      inputPanel.add(new JLabel("Title: "));
+      inputPanel.add(title);
+      inputPanel.add(new JLabel("All-Day: "));
+      inputPanel.add(allDay);
+      
+      int result = JOptionPane.showConfirmDialog(null, inputPanel, "New Event", JOptionPane.OK_CANCEL_OPTION);
+      
+      // !Null input check
+      if (result == JOptionPane.OK_OPTION) {
+         try {                
+            JOptionPane.showMessageDialog(null, "Event added successfully!");
+            barGraphInput = title.getText();
+            specifiedDay = Integer.parseInt(day.getText());
+            specifiedMonth = Integer.parseInt(month.getText());
             updateBarGraph();
-            SwingUtilities.invokeLater(() -> { BarGraph barGraph = new BarGraph(currentMap); barGraph.setVisible(true);});
-        }
-        else {
-            JOptionPane.showMessageDialog(null, "There are no events for this month.");
-            updateCalendar();
-        }
-    }
-    
-    private void updateBarGraph() {        
-        currentMap.put(barGraphInput, count++);
-        currentMap1.put(specifiedDay, specifiedMonth);
-        
-        for (Map.Entry<String, Integer> entry : currentMap.entrySet()) {
-            String key = entry.getKey();
-            Integer value = entry.getValue();
+         } 
+         
+         catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(null, "Invalid input. Please enter a valid number for the day.");
+         }
+      }
+   }
 
-            // Print key-value pairs
-            System.out.print("Title: " + key + ", Count: " + value);
-            
-            // send to calendar
-            updateCalendar();
-        }
-        for (Map.Entry<Integer, Integer> entry : currentMap1.entrySet()) {
-            Integer key = entry.getKey();
-            Integer value = entry.getValue();
+   private void updateCalendar() {
+      calendarPanel.removeAll();
+   
+      // Days of the week
+      for (String day : daysOfWeek) {
+         JLabel label = new JLabel(day, SwingConstants.CENTER);
+         calendarPanel.add(label);
+      }
+   
+      // Blank spaces for the first day of the month
+      int firstDayOfMonth = currentMonth.get(Calendar.DAY_OF_WEEK) - 1;
+      for (int i = 0; i < firstDayOfMonth; i++) {
+         calendarPanel.add(new JLabel());
+      }
+   
+      // Days of the month
+      int maxDay = currentMonth.getActualMaximum(Calendar.DAY_OF_MONTH);
+      for (int i = 1; i <= maxDay; i++) {
+         JButton dayButton = new JButton(Integer.toString(i));
+         dayButton.addActionListener(new DayButtonListener(i));
+         calendarPanel.add(dayButton);
+      }
+   
+      revalidate();
+      repaint();
+   }
 
-            // Print key-value pairs
-            System.out.println(", Day: " + key + ", Month: " + value);
-        }
-    }
-    
-    // Show Events :-)
-    private void showEvents() {
-        if (count >= 1) {
-            JPanel showEventsPanel = new JPanel(new GridLayout(count, 1));
-            for (String a : currentMap.keySet()) {
-                 for //search through every day in the month, find whichever day corresponds to day clicked and then print out whatever was saved in the day clicked
-                     if (day = dayClicked)
-                           showEventsPanel.add(new JLabel(a));
-            }
-        }
-        else {
-            JOptionPane.showMessageDialog(null, "There are no events for this month.");
-            updateCalendar();
-        }
-    }
-    
-    private void updateInput() {
-        JTextField title = new JTextField();
-        JTextField day = new JTextField();
-        JTextField month = new JTextField();
-        JToggleButton allDay = new JToggleButton("False");
-        
-        allDay.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (allDay.isSelected()) {
-                    allDay.setText("True");
-                } else {
-                    allDay.setText("False");
-                }
-            }
-        });
+   private class DayButtonListener implements ActionListener {
+      private int day;
+   
+      public DayButtonListener(int day) {
+         this.day = day;
+      }
+   
+      @Override
+      public void actionPerformed(ActionEvent e) {
+         showEvents();
+      }
+   }
 
-        JPanel inputPanel = new JPanel(new GridLayout(5, 2));
-        inputPanel.add(new JLabel("Day: "));
-        inputPanel.add(day);
-        inputPanel.add(new JLabel("Month: "));
-        inputPanel.add(month);
-        inputPanel.add(new JLabel("Title: "));
-        inputPanel.add(title);
-        inputPanel.add(new JLabel("All-Day: "));
-        inputPanel.add(allDay);
-        
-        int result = JOptionPane.showConfirmDialog(null, inputPanel,
-                "New Event", JOptionPane.OK_CANCEL_OPTION);
-        
-        // !Null input check
-        if (result == JOptionPane.OK_OPTION) {
-            try {                
-                JOptionPane.showMessageDialog(null, "Event added successfully!");
-                barGraphInput = title.getText();
-                specifiedDay = Integer.parseInt(day.getText());
-                specifiedMonth = Integer.parseInt(month.getText());
-                updateBarGraph();
-            } 
-            
-            catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(null, "Invalid input. Please enter a valid number for the day.");
-            }
-        }
-    }
-
-    private void updateCalendar() {
-        calendarPanel.removeAll();
-
-        // Days of the week
-        String[] daysOfWeek = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
-        for (String day : daysOfWeek) {
-            JLabel label = new JLabel(day, SwingConstants.CENTER);
-            calendarPanel.add(label);
-        }
-
-        // Blank spaces for the first day of the month
-        int firstDayOfMonth = currentMonth.get(Calendar.DAY_OF_WEEK) - 1;
-        for (int i = 0; i < firstDayOfMonth; i++) {
-            calendarPanel.add(new JLabel());
-        }
-
-        // Days of the month
-        int maxDay = currentMonth.getActualMaximum(Calendar.DAY_OF_MONTH);
-        for (int i = 1; i <= maxDay; i++) {
-            JButton dayButton = new JButton(Integer.toString(i));
-            dayButton.addActionListener(new DayButtonListener(i));
-            calendarPanel.add(dayButton);
-        }
-
-        revalidate();
-        repaint();
-    }
-
-    private class DayButtonListener implements ActionListener {
-        private int day;
-
-        public DayButtonListener(int day) {
-            this.day = day;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            dayClicked = day;
-            System.out.print(dayClicked);
-            showEvents();
-        }
-    }
-
-    public static void main(String[] args) {       
-        SwingUtilities.invokeLater(new Runnable() {
+   public static void main(String[] args) {       
+      SwingUtilities.invokeLater(
+         new Runnable() {
             @Override
             public void run() {
-                new CalendarApp();
+               new CalendarApp();
             }
-        });
-    }
+         });
+   }
 }
