@@ -18,6 +18,21 @@ public class BarGraph extends JFrame {
       chartPanel.setPreferredSize(new Dimension(400, 300));
       setContentPane(chartPanel);
    }
+
+   public static void main(String[] args) {
+      Map<String, Integer> data = new LinkedHashMap<>(); // LinkedHashMap to store the x and y value of each bar
+      
+      // Add each day of the week to the LinkedHashMap
+      data.put("Monday", 5);
+      data.put("Tuesday", 8);
+      data.put("Wednesday", 3);
+      data.put("Thursday", 4);
+      data.put("Friday", 1);
+      data.put("Saturday", 12);
+      data.put("Sunday", 10);
+   
+      SwingUtilities.invokeLater(() -> { BarGraph barGraph = new BarGraph(data); barGraph.setVisible(true);});
+   }
 }
 
 class BarChartPanel extends JPanel {
