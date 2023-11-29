@@ -131,6 +131,8 @@ public class CalendarApp extends JFrame {
     
     private void updateInput() {
         JTextField title = new JTextField();
+        JTextField day = new JTextField();
+        JTextField month = new JTextField();
         JToggleButton allDay = new JToggleButton("False");
         //J starts = new J();
         //J ends = new J();
@@ -147,13 +149,14 @@ public class CalendarApp extends JFrame {
             }
         });
 
-        JPanel inputPanel = new JPanel(new GridLayout(3, 2));
-        inputPanel.add(new JLabel("Day: " + currentMonth.get(Calendar.DAY_OF_MONTH)));
-        inputPanel.add(new JLabel("Month: " +
-                                  currentMonth.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.ENGLISH)));
-        inputPanel.add(new JLabel("Title:"));
+        JPanel inputPanel = new JPanel(new GridLayout(5, 2));
+        inputPanel.add(new JLabel("Day: "));
+        inputPanel.add(day);
+        inputPanel.add(new JLabel("Month: "));
+        inputPanel.add(month);
+        inputPanel.add(new JLabel("Title: "));
         inputPanel.add(title);
-        inputPanel.add(new JLabel("All-Day:"));
+        inputPanel.add(new JLabel("All-Day: "));
         inputPanel.add(allDay);        
         
         int result = JOptionPane.showConfirmDialog(null, inputPanel,
