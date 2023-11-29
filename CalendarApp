@@ -81,7 +81,6 @@ public class CalendarApp extends JFrame {
         barGraphButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                updateBarGraph();
                 openBarGraph();
             }
         });
@@ -113,7 +112,7 @@ public class CalendarApp extends JFrame {
             updateBarGraph();
             SwingUtilities.invokeLater(() -> { BarGraph barGraph = new BarGraph(currentMap); barGraph.setVisible(true);});
         }
-        else if (count = null) {
+        else {
             JOptionPane.showMessageDialog(null, "There are no events for this month.");
             updateCalendar();
         }
