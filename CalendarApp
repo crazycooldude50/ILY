@@ -8,6 +8,9 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Iterator;
+import java.util.*;
+import java.util.List;
 
 public class CalendarApp extends JFrame {
    private JLabel monthLabel;
@@ -25,9 +28,11 @@ public class CalendarApp extends JFrame {
    private int dayClicked;
    
    // amount of events in a day count (all bar graph)
-   private int count = 0;
+   private int count = 1;
    private Map<String, Integer> currentMap = new LinkedHashMap<>();
    private Map<Integer, Integer> currentMap1 = new LinkedHashMap<>();
+   private Map<Integer, Integer> eventCountsPerDay = new LinkedHashMap<>();
+
    
    private Calendar currentMonth;
    
@@ -125,65 +130,105 @@ public class CalendarApp extends JFrame {
       monthLabel.setText(sdf.format(currentMonth.getTime()));
    }
    
-private void openBarGraph() {
-    if (count >= 1) {
-        // Use the current month and year
-        Calendar calendar = Calendar.getInstance();
-        
-        String dateString = JOptionPane.showInputDialog("Enter a day of the month:");
-        try {
-            int selectedDay = Integer.parseInt(dateString);
+   private void openBarGraph() {
+    // Use the current month and year
+    Calendar calendar = Calendar.getInstance();
+
+    String dateString = JOptionPane.showInputDialog("Enter a day of the month:");
+    try {
+        int selectedDay = Integer.parseInt(dateString);
+
+        if (selectedDay >= 1 && selectedDay <= calendar.getActualMaximum(Calendar.DAY_OF_MONTH)) {
 
             // Set the selected day in the current month and year
             calendar.set(Calendar.DAY_OF_MONTH, selectedDay);
 
-            // Calculate the start day (Monday) and end day (Sunday) of the week
-            int dayOfWeekIndex = calendar.get(Calendar.DAY_OF_WEEK) - 2;
+            // Calculate the start day (Sunday) and end day (Saturday) of the week
+            int dayOfWeekIndex = calendar.get(Calendar.DAY_OF_WEEK) - 1;
             int startDay = selectedDay - dayOfWeekIndex;
 
-            // Adjust for the first week of the month
-            startDay = Math.max(1, startDay);
-
-            // Store each date from the first day to the seventh in an array
+            // Store each date from Sunday to Saturday in an array
             String[] selectedWeekDates = new String[7];
             for (int i = 0; i < 7; i++) {
                 selectedWeekDates[i] = String.valueOf(startDay + i);
+                System.out.println(selectedWeekDates[i]);
             }
+            Map<Integer, Integer> eventCountsPerDay2 = new LinkedHashMap<>();
+            eventCountsPerDay2.putAll(eventCountsPerDay);
+            System.out.println("Event Counts Per Day: " + eventCountsPerDay2);
+
+            Iterator<Integer> iterator = eventCountsPerDay2.keySet().iterator();
+
+            while (iterator.hasNext()) {
+                int it = iterator.next();
+                if (startDay > it || startDay + 6 < it) {
+                    iterator.remove();
+                }
+            }
+
+            Map<Integer, Integer> modifications = new HashMap<>();
+
+            for (int i = startDay; i < startDay + 7; i++) {
+                if (!eventCountsPerDay2.containsKey(i)) {
+                    modifications.put(i, 0);
+                }
+            }
+
+            eventCountsPerDay2.putAll(modifications);
+
+            System.out.println("Event Counts Per Day: " + eventCountsPerDay2);
+
+            List<Map.Entry<Integer, Integer>> entryList = new ArrayList<>(eventCountsPerDay2.entrySet());
+            Collections.sort(entryList, Comparator.comparingInt(Map.Entry::getKey));
+
+            // Create a new LinkedHashMap with sorted entries
+            LinkedHashMap<Integer, Integer> sortedEventCountsPerDay2 = new LinkedHashMap<>();
+            for (Map.Entry<Integer, Integer> entry : entryList) {
+                sortedEventCountsPerDay2.put(entry.getKey(), entry.getValue());
+            }
+            System.out.println("Event Counts Per Day: " + sortedEventCountsPerDay2);
+
+            // Pass the correct data (eventCountsPerDay) to the BarGraph constructor
+            if (sortedEventCountsPerDay2.size() > 0) {
+                // Check if there is any key with a value greater than 0
+                boolean hasPositiveValue = sortedEventCountsPerDay2.values().stream().anyMatch(value -> value > 0);
+
+                if (hasPositiveValue) {
+                    SwingUtilities.invokeLater(() -> {
+                        BarGraph barGraph = new BarGraph(sortedEventCountsPerDay2);
+                        barGraph.setVisible(true);
+                    });
+                } else {
+                    JOptionPane.showMessageDialog(null, "There are no events with a count greater than 0 for this week.");
+                    updateCalendar();
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "There are no events for this week.");
+                updateCalendar();
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(null, "Invalid day. Please enter a valid day for the current month.");
         }
-        
-        catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "Invalid input. Please enter a valid number for the day.");
-        }
-    } 
-    else {
-        JOptionPane.showMessageDialog(null, "There are no events for this month.");
-        updateCalendar();
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(null, "Invalid input. Please enter a valid number for the day.");
     }
 }
-
    
-   private void updateBarGraph() {
-      for (int i = 0; i < daysOfWeek.length; i++) {         
-         currentMap.put(daysOfWeek[i], count++);
-      }
-      currentMap1.put(specifiedDay, specifiedMonth);
+   private void updateBarGraph(int selectedDay) {
+    // Increment the count for the selected day
+      eventCountsPerDay.put(selectedDay, eventCountsPerDay.getOrDefault(selectedDay, 0) + 1);
+   
+    // Print the updated counts
+      for (Map.Entry<Integer, Integer> entry : eventCountsPerDay.entrySet()) {
+         Integer day = entry.getKey();
+         Integer count = entry.getValue();
       
-      for (Map.Entry<String, Integer> entry : currentMap.entrySet()) {
-         String key = entry.getKey();
-         Integer value = entry.getValue();
-      
-         // Print key-value pairs
-         System.out.print("Title: " + key + ", Count: " + value);
-      }
-      for (Map.Entry<Integer, Integer> entry : currentMap1.entrySet()) {
-         Integer key = entry.getKey();
-         Integer value = entry.getValue();
-      
-         // Print key-value pairs
-         System.out.println(", Day: " + key + ", Month: " + value);
+        // Print key-value pairs
+         System.out.println("Day: " + day + ", Count: " + count);
       }
    }
-   
+  
    // Show Events :-)
    private void showEvents() {
       if (count >= 1) {
@@ -235,7 +280,7 @@ private void openBarGraph() {
             barGraphInput = title.getText();
             specifiedDay = Integer.parseInt(day.getText());
             specifiedMonth = Integer.parseInt(month.getText());
-            updateBarGraph();
+            updateBarGraph(specifiedDay);
          } 
          
          catch (NumberFormatException ex) {
