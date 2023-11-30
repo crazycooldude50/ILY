@@ -32,10 +32,10 @@ public class CalendarApp extends JFrame {
     // Amount of events in a day (clicked) (show Events)
     private int countEvents = 0;
     private Map<Integer, Integer> eventCountsPerDay = new LinkedHashMap<>();
-    private List<String> importantEventsList = new ArrayList<>();
     
     // Important Events
     private int countImp = 0;
+    private Map<String, Integer> importantEventsMap = new LinkedHashMap<>();
 
     private Calendar currentMonth;
 
@@ -243,6 +243,12 @@ public class CalendarApp extends JFrame {
     private void updateImportantEventsList() {
         if (countImp > 0) {
             ShowImportant importantEventsText = new ShowImportant(countImp);
+             for (Map.Entry<String, Integer> entry : importantEventsMap.entrySet()) {
+                String event = entry.getKey();
+                Integer count = entry.getValue();
+                importantEventsText.add(new JLabel(event));
+            }
+
             importantEventsText.setVisible(true);
         }
         else {
@@ -299,9 +305,10 @@ public class CalendarApp extends JFrame {
                 
         important.addActionListener(
                 new ActionListener() {
+                    int countTemp = countImp;
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        int countTemp = countImp;
+                        
                         if(important.isSelected()) {
                             important.setText("Important");
                             countImp++;
@@ -337,8 +344,7 @@ public class CalendarApp extends JFrame {
                 eventCountsPerDay.put(specifiedDay, countEvents++);
                 specifiedMonth = Integer.parseInt(month.getText());
                 updateBarGraph(specifiedDay);
-                
-
+                importantEventsMap.put(barGraphInput, countImp);
             }
 
             catch (NumberFormatException ex) {
