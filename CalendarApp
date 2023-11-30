@@ -24,13 +24,13 @@ public class CalendarApp extends JFrame {
    private int specifiedDay;
    private int specifiedMonth;
    
-   // Day clicked
-   private int dayClicked;
-   
-   // amount of events in a day count (all bar graph)
-   private int count = 1;
+   // amount of events in a day (Manual) (Bar Graph)
    private Map<String, Integer> currentMap = new LinkedHashMap<>();
    private Map<Integer, Integer> currentMap1 = new LinkedHashMap<>();
+   private Map<Integer, Integer> eventCountsPerManualDay = new LinkedHashMap<>();
+   
+   // Amount of events in a day (clicked) (show Events)
+   private int countClick = 0;
    private Map<Integer, Integer> eventCountsPerDay = new LinkedHashMap<>();
 
    
@@ -153,11 +153,11 @@ public class CalendarApp extends JFrame {
                 selectedWeekDates[i] = String.valueOf(startDay + i);
                 System.out.println(selectedWeekDates[i]);
             }
-            Map<Integer, Integer> eventCountsPerDay2 = new LinkedHashMap<>();
-            eventCountsPerDay2.putAll(eventCountsPerDay);
-            System.out.println("Event Counts Per Day: " + eventCountsPerDay2);
+            Map<Integer, Integer> eventCountsPerManualDay2 = new LinkedHashMap<>();
+            eventCountsPerManualDay2.putAll(eventCountsPerManualDay);
+            System.out.println("Event Counts Per Day: " + eventCountsPerManualDay2);
 
-            Iterator<Integer> iterator = eventCountsPerDay2.keySet().iterator();
+            Iterator<Integer> iterator = eventCountsPerManualDay2.keySet().iterator();
 
             while (iterator.hasNext()) {
                 int it = iterator.next();
@@ -169,16 +169,16 @@ public class CalendarApp extends JFrame {
             Map<Integer, Integer> modifications = new HashMap<>();
 
             for (int i = startDay; i < startDay + 7; i++) {
-                if (!eventCountsPerDay2.containsKey(i)) {
+                if (!eventCountsPerManualDay2.containsKey(i)) {
                     modifications.put(i, 0);
                 }
             }
 
-            eventCountsPerDay2.putAll(modifications);
+            eventCountsPerManualDay2.putAll(modifications);
 
-            System.out.println("Event Counts Per Day: " + eventCountsPerDay2);
+            System.out.println("Event Counts Per Day: " + eventCountsPerManualDay2);
 
-            List<Map.Entry<Integer, Integer>> entryList = new ArrayList<>(eventCountsPerDay2.entrySet());
+            List<Map.Entry<Integer, Integer>> entryList = new ArrayList<>(eventCountsPerManualDay2.entrySet());
             Collections.sort(entryList, Comparator.comparingInt(Map.Entry::getKey));
 
             // Create a new LinkedHashMap with sorted entries
@@ -216,29 +216,38 @@ public class CalendarApp extends JFrame {
 }
    
    private void updateBarGraph(int selectedDay) {
-    // Increment the count for the selected day
-      eventCountsPerDay.put(selectedDay, eventCountsPerDay.getOrDefault(selectedDay, 0) + 1);
+      // Increment the count for the selected day
+      eventCountsPerManualDay.put(selectedDay, eventCountsPerManualDay.getOrDefault(selectedDay, 0) + 1);
    
-    // Print the updated counts
-      for (Map.Entry<Integer, Integer> entry : eventCountsPerDay.entrySet()) {
+      // Print the updated counts
+      for (Map.Entry<Integer, Integer> entry : eventCountsPerManualDay.entrySet()) {
          Integer day = entry.getKey();
-         Integer count = entry.getValue();
-      
-        // Print key-value pairs
-         System.out.println("Day: " + day + ", Count: " + count);
+         Integer countCloudz = entry.getValue();
+     
+         // Print key-value pairs
+         System.out.println("Day: " + day + ", Count: " + countCloudz);
       }
    }
   
    // Show Events :-)
-   private void showEvents() {
-      if (count >= 1) {
-         JPanel showEventsPanel = new JPanel(new GridLayout(count, 1));
-         for (String a : currentMap.keySet()) {
-            showEventsPanel.add(new JLabel(a));
+   private void showEvents(int dayClicked) {
+      if (countClick >= 1) {
+         JPanel showEventsPanel = new JPanel(new GridLayout(countClick, 1));
+         for (Map.Entry<String, Integer> entry : currentMap.entrySet()) {
+            Integer days = entry.getValue();
+            String event = entry.getKey();
+            if (days == dayClicked) {
+               for (Map.Entry<Integer, Integer> entry1 : eventCountsPerDay.entrySet()) {
+                  Integer days1 = entry1.getKey();
+                  if (days == days1) {
+                     showEventsPanel.add(new JLabel(event));
+                  }
+               }
+            }
          }
       }
       else {
-         JOptionPane.showMessageDialog(null, "There are no events for this month.");
+         JOptionPane.showMessageDialog(null, "There are no events for this day.");
          updateCalendar();
       }
    }
@@ -269,7 +278,7 @@ public class CalendarApp extends JFrame {
       inputPanel.add(new JLabel("Title: "));
       inputPanel.add(title);
       inputPanel.add(new JLabel("All-Day: "));
-      inputPanel.add(allDay);
+      inputPanel.add(allDay);      
       
       int result = JOptionPane.showConfirmDialog(null, inputPanel, "New Event", JOptionPane.OK_CANCEL_OPTION);
       
@@ -279,6 +288,7 @@ public class CalendarApp extends JFrame {
             JOptionPane.showMessageDialog(null, "Event added successfully!");
             barGraphInput = title.getText();
             specifiedDay = Integer.parseInt(day.getText());
+            eventCountsPerDay.put(specifiedDay, countClick++);
             specifiedMonth = Integer.parseInt(month.getText());
             updateBarGraph(specifiedDay);
          } 
@@ -325,7 +335,8 @@ public class CalendarApp extends JFrame {
    
       @Override
       public void actionPerformed(ActionEvent e) {
-         showEvents();
+         System.out.println(day);
+         showEvents(day);
       }
    }
 
