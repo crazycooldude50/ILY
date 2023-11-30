@@ -359,6 +359,7 @@ public class CalendarApp extends JFrame {
         calendarPanel.removeAll();
 
         // Days of the week
+        String[] daysOfWeek = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
         for (String day : daysOfWeek) {
             JLabel label = new JLabel(day, SwingConstants.CENTER);
             calendarPanel.add(label);
@@ -366,7 +367,7 @@ public class CalendarApp extends JFrame {
 
         // Blank spaces for the first day of the month
         int firstDayOfMonth = currentMonth.get(Calendar.DAY_OF_WEEK) - 1;
-        for (int i = 0; i < firstDayOfMonth; i++) {
+        for (int i = 1; i < firstDayOfMonth; i++) {
             calendarPanel.add(new JLabel());
         }
 
