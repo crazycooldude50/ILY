@@ -37,8 +37,8 @@ public class CalendarApp extends JFrame {
     private int countImp = 0;
     private Map<String, Integer> importantEventsMap = new LinkedHashMap<>();
 
+    // Calendar Setup
     private Calendar currentMonth;
-
     private String[] daysOfWeek = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 
     public CalendarApp() {
@@ -359,7 +359,6 @@ public class CalendarApp extends JFrame {
         calendarPanel.removeAll();
 
         // Days of the week
-        String[] daysOfWeek = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
         for (String day : daysOfWeek) {
             JLabel label = new JLabel(day, SwingConstants.CENTER);
             calendarPanel.add(label);
