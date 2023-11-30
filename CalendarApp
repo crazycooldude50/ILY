@@ -211,10 +211,10 @@ public class CalendarApp extends JFrame {
                 // Pass the correct data (eventCountsPerDay) to the BarGraph constructor
                 if (sortedEventCountsPerDay2.size() > 0) {
                     // Check if there is any key with a value greater than 0
-                    boolean hasPositiveValue = sortedEventCountsPerDay2.values().stream().anyMatch(value - > value > 0);
+                    boolean hasPositiveValue = sortedEventCountsPerDay2.values().stream().anyMatch(value -> value > 0);
 
                     if (hasPositiveValue) {
-                        SwingUtilities.invokeLater(() - > {
+                        SwingUtilities.invokeLater(() -> {
                             BarGraph barGraph = new BarGraph(sortedEventCountsPerDay2);
                             barGraph.setVisible(true);
                         });
