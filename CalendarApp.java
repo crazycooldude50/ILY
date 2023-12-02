@@ -22,7 +22,7 @@ public class CalendarApp extends JFrame {
    private JPanel showEventsPanel;
    private JPanel importantEventsPanel;
 
-   // Specified Variables f
+   // Specified Variables
    private String barGraphInput;
    private int specifiedDay;
    private int specifiedMonth;
