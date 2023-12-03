@@ -1,66 +1,166 @@
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.*;
 
-public class InformationManagementApp {
-    private static final String FILE_NAME = "saved_information.txt";
+public class AuthenticationPanel extends JFrame {
+   private Map<String, String> userCredentials;
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            createAndShowGUI();
-        });
-    }
+   public AuthenticationPanel() {
+      userCredentials = loadUserCredentials();
 
-    private static void createAndShowGUI() {
-        JFrame frame = new JFrame("Information Management App");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 200);
+      setTitle("Sign Up / Login Panel");
+      setSize(300, 150);
+      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      setLocationRelativeTo(null);
 
-        JTextArea informationTextArea = new JTextArea(5, 30);
-        JButton saveAndDisplayButton = new JButton("Save and Display Information");
+      JPanel panel = new JPanel();
+      panel.setLayout(new GridLayout(3, 1));
 
-        saveAndDisplayButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String information = JOptionPane.showInputDialog("Enter Information:");
-                if (information != null && !information.isEmpty()) {
-                    appendInformationToFile(information);
-                    displayInformationFromFile(informationTextArea);
-                }
+      JButton signUpButton = new JButton("Sign Up");
+      JButton loginButton = new JButton("Login");
+
+      signUpButton.addActionListener(new ActionListener() {
+         @Override
+         public void actionPerformed(ActionEvent e) {
+            showSignUpDialog();
+         }
+      });
+
+      loginButton.addActionListener(new ActionListener() {
+         @Override
+         public void actionPerformed(ActionEvent e) {
+            showLoginDialog();
+         }
+      });
+
+      panel.add(signUpButton);
+      panel.add(loginButton);
+      
+      add(panel);
+
+      setVisible(true);
+   }
+
+   private Map<String, String> loadUserCredentials() {
+      Map<String, String> credentials = new HashMap<>();
+
+      try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("user_credentials.dat"))) {
+         credentials = (Map<String, String>) ois.readObject();
+      } catch (FileNotFoundException e) {
+         // Handle file not found (first run)
+      } catch (IOException | ClassNotFoundException e) {
+         e.printStackTrace(); // Handle other exceptions
+      }
+
+      return credentials;
+   }
+
+   private void saveUserCredentials() {
+      try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("user_credentials.dat"))) {
+         oos.writeObject(userCredentials);
+      } catch (IOException e) {
+         e.printStackTrace(); // Handle the exception
+      }
+   }
+
+   private void showSignUpDialog() {
+      JFrame signUpFrame = new JFrame("Sign Up");
+      signUpFrame.setSize(300, 150);
+      signUpFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+      signUpFrame.setLocationRelativeTo(this);
+
+      JPanel signUpPanel = new JPanel();
+      signUpPanel.setLayout(new GridLayout(3, 2));
+
+      JTextField usernameField = new JTextField();
+      JPasswordField passwordField = new JPasswordField();
+
+      JButton signUpButton = new JButton("Sign Up");
+      signUpButton.addActionListener(new ActionListener() {
+         @Override
+         public void actionPerformed(ActionEvent e) {
+            String username = usernameField.getText();
+            char[] passwordChars = passwordField.getPassword();
+            String password = new String(passwordChars);
+
+            if (!userCredentials.containsKey(username)) {
+               userCredentials.put(username, password);
+               saveUserCredentials(); // Save user credentials to file
+               JOptionPane.showMessageDialog(signUpFrame, "Sign Up Successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+               signUpFrame.dispose();
+            } else {
+               JOptionPane.showMessageDialog(signUpFrame, "Username already exists. Please choose a different username.", "Error", JOptionPane.ERROR_MESSAGE);
             }
-        });
+         }
+      });
+      signUpPanel.add(new JLabel("Username:"));
+      signUpPanel.add(usernameField);
+      signUpPanel.add(new JLabel("Password:"));
+      signUpPanel.add(passwordField);
+      signUpPanel.add(signUpButton);
 
-        JPanel panel = new JPanel();
-        panel.add(saveAndDisplayButton);
+      signUpFrame.add(signUpPanel);
+      signUpFrame.setVisible(true);
+   }
 
-        frame.getContentPane().setLayout(new BorderLayout());
-        frame.getContentPane().add(new JScrollPane(informationTextArea), BorderLayout.CENTER);
-        frame.getContentPane().add(panel, BorderLayout.SOUTH);
+   private void showLoginDialog() {
+      JFrame loginFrame = new JFrame("Login");
+      loginFrame.setSize(300, 150);
+      loginFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+      loginFrame.setLocationRelativeTo(this);
 
-        frame.setVisible(true);
-    }
+      JPanel loginPanel = new JPanel();
+      loginPanel.setLayout(new GridLayout(3, 2));
 
-    private static void appendInformationToFile(String information) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, true))) {
-            writer.write(information);
-            writer.newLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+      JTextField usernameField = new JTextField();
+      JPasswordField passwordField = new JPasswordField();
 
-    private static void displayInformationFromFile(JTextArea textArea) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
-            StringBuilder content = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                content.append(line).append("\n");
+      JButton loginButton = new JButton("Login");
+      loginButton.addActionListener(new ActionListener() {
+         @Override
+         public void actionPerformed(ActionEvent e) {
+            String username = usernameField.getText();
+            char[] passwordChars = passwordField.getPassword();
+            String password = new String(passwordChars);
+
+            if (userCredentials.containsKey(username) && userCredentials.get(username).equals(password)) {
+               openMainApplication(username); // Pass the username to the main application
+               saveUserCredentials(); // Save user credentials to file after successful login
+               loginFrame.dispose();
+            } else {
+               JOptionPane.showMessageDialog(loginFrame, "Invalid username or password. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
             }
-            textArea.setText(content.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+         }
+      });
+      loginPanel.add(new JLabel("Username:"));
+      loginPanel.add(usernameField);
+      loginPanel.add(new JLabel("Password:"));
+      loginPanel.add(passwordField);
+      loginPanel.add(loginButton);
+
+      loginFrame.add(loginPanel);
+      loginFrame.setVisible(true);
+   }
+
+   private void openMainApplication(String username) {
+      SwingUtilities.invokeLater(new Runnable() {
+         @Override
+         public void run() {
+            new CalendarApp(username); // Pass the username to CalendarApp
+         }
+      });
+   }
+
+   public static void main(String[] args) {
+      SwingUtilities.invokeLater(new Runnable() {
+         @Override
+         public void run() {
+            new AuthenticationPanel();
+         }
+      });
+   }
 }
