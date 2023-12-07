@@ -7,11 +7,9 @@ import java.util.Map;
 import javax.swing.*;
 
 public class AuthenticationPanel extends JFrame {
-   private Map<String, String> userCredentials;
+   private static final String FILE_NAME = "saved_information.txt";
 
    public AuthenticationPanel() {
-      userCredentials = loadUserCredentials();
-
       setTitle("Sign Up / Login Panel");
       setSize(300, 150);
       setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -39,35 +37,74 @@ public class AuthenticationPanel extends JFrame {
 
       panel.add(signUpButton);
       panel.add(loginButton);
-      
+
       add(panel);
 
       setVisible(true);
    }
 
-   private Map<String, String> loadUserCredentials() {
-      Map<String, String> credentials = new HashMap<>();
-
-      try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("user_credentials.dat"))) {
-         credentials = (Map<String, String>) ois.readObject();
-      } catch (FileNotFoundException e) {
-         // Handle file not found (first run)
-      } catch (IOException | ClassNotFoundException e) {
-         e.printStackTrace(); // Handle other exceptions
-      }
-
-      return credentials;
-   }
-
-   private void saveUserCredentials() {
-      try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("user_credentials.dat"))) {
-         oos.writeObject(userCredentials);
+   private static void addNewProfile(String username, String password) {
+      try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_NAME, true))) {
+         // Write lines to the newly created file
+         writer.println("Username: " + username);
+         writer.println("Password: " + password);
+         writer.println("Title: ");
+         writer.println("Month: ");
+         writer.println("Day: ");
       } catch (IOException e) {
-         e.printStackTrace(); // Handle the exception
+         e.printStackTrace();
       }
    }
+    
+    private void updatePassword(String currentUsername, String currentPassword) {
+    String[] lines;
 
-   private void showSignUpDialog() {
+    // Read all lines from the existing file into an array
+    try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
+        // Count the number of lines
+        int lineCount = 0;
+        while (reader.readLine() != null) {
+            lineCount++;
+        }
+
+        // Initialize the array
+        lines = new String[lineCount];
+
+        // Reset the reader to the beginning of the file
+        reader.close();
+        reader = new BufferedReader(new FileReader(FILE_NAME));
+
+        // Read lines into the array
+        for (int i = 0; i < lineCount; i++) {
+            lines[i] = reader.readLine();
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
+        return;
+    }
+
+    // Update the password line in the array
+    for (int i = 0; i < lines.length; i++) {
+        if (lines[i].startsWith("Username: " + currentUsername)) {
+            lines[i] = "Password: " + currentPassword;
+        }
+    }
+
+    // Write the updated array back to the file
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
+        for (String line : lines) {
+            writer.write(line);
+            writer.newLine();
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
+        return;
+    }
+
+    System.out.println("Password updated successfully.");
+}
+
+ private void showSignUpDialog() {
       JFrame signUpFrame = new JFrame("Sign Up");
       signUpFrame.setSize(300, 150);
       signUpFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -88,8 +125,10 @@ public class AuthenticationPanel extends JFrame {
             String password = new String(passwordChars);
 
             if (!userCredentials.containsKey(username)) {
+               addNewProfile(username);
                userCredentials.put(username, password);
-               saveUserCredentials(); // Save user credentials to file
+               updatePassword(username, password);
+
                JOptionPane.showMessageDialog(signUpFrame, "Sign Up Successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
                signUpFrame.dispose();
             } else {
@@ -124,12 +163,12 @@ public class AuthenticationPanel extends JFrame {
          @Override
          public void actionPerformed(ActionEvent e) {
             String username = usernameField.getText();
-            char[] passwordChars = passwordField.getPassword();
-            String password = new String(passwordChars);
+            String password = passwordField.getText();
+            System.out.println(userCredentials);
 
             if (userCredentials.containsKey(username) && userCredentials.get(username).equals(password)) {
-               openMainApplication(username); // Pass the username to the main application
-               saveUserCredentials(); // Save user credentials to file after successful login
+               updatePassword(username, password); // Update password after successful login
+               openMainApplication(username);
                loginFrame.dispose();
             } else {
                JOptionPane.showMessageDialog(loginFrame, "Invalid username or password. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
