@@ -460,7 +460,7 @@ public class CalendarApp extends JFrame {
     days.put("Sat", 7);
     int firstDayOfMonth = days.get(firstDay);
     System.out.println(firstDayOfMonth);
-      for (int i = 1; i < firstDayOfMonth; i++) {
+      for (int i = 1; i < firstDayOfMonth - 1; i++) {
     calendarPanel.add(new JLabel());
 }              
    
