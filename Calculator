@@ -1,0 +1,122 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class Calculator extends JFrame {
+
+    private JTextField display;
+    private double operand1;
+    private String operator;
+    private boolean clearOnNextDigit;
+
+    public Calculator() {
+        super("Calculator");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+
+        display = new JTextField();
+        display.setEditable(false);
+        display.setFont(new Font("Arial", Font.PLAIN, 32));
+        add(display, BorderLayout.NORTH);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridLayout(5, 4));
+
+        String[] buttonLabels = {
+                "7", "8", "9", "/",
+                "4", "5", "6", "*",
+                "1", "2", "3", "-",
+                "0", ".", "=", "+",
+                "C", "<-"
+        };
+
+        for (String label : buttonLabels) {
+            JButton button = new JButton(label);
+            button.addActionListener(new ButtonClickListener());
+            button.setFont(new Font("Arial", Font.PLAIN, 18));
+            buttonPanel.add(button);
+        }
+
+        add(buttonPanel, BorderLayout.CENTER);
+
+        pack();
+        setSize(400, 600);
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+
+    private class ButtonClickListener implements ActionListener {
+        public void actionPerformed(ActionEvent event) {
+            JButton source = (JButton) event.getSource();
+            String buttonText = source.getText();
+
+            switch (buttonText) {
+                case "=":
+                    calculateResult();
+                    break;
+                case "+":
+                case "-":
+                case "*":
+                case "/":
+                    operator = buttonText;
+                    operand1 = Double.parseDouble(display.getText());
+                    clearOnNextDigit = true;
+                    break;
+                case "C":
+                    display.setText("");
+                    operator = "";
+                    operand1 = 0;
+                    break;
+                case "<-":
+                    String currentText = display.getText();
+                    if (!currentText.isEmpty()) {
+                        display.setText(currentText.substring(0, currentText.length() - 1));
+                    }
+                    break;
+                default:
+                    if (clearOnNextDigit) {
+                        display.setText(buttonText);
+                        clearOnNextDigit = false;
+                    } else {
+                        display.setText(display.getText() + buttonText);
+                    }
+                    break;
+            }
+        }
+
+        private void calculateResult() {
+            if (operator != null && !operator.isEmpty()) {
+                double operand2 = Double.parseDouble(display.getText());
+                double result = 0;
+
+                switch (operator) {
+                    case "+":
+                        result = operand1 + operand2;
+                        break;
+                    case "-":
+                        result = operand1 - operand2;
+                        break;
+                    case "*":
+                        result = operand1 * operand2;
+                        break;
+                    case "/":
+                        if (operand2 != 0) {
+                            result = operand1 / operand2;
+                        } else {
+                            display.setText("Error");
+                            return;
+                        }
+                        break;
+                }
+
+                display.setText(String.valueOf(result));
+                operator = "";
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new Calculator());
+    }
+}
