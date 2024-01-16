@@ -212,11 +212,11 @@ private void showLoginDialog() {
     loginFrame.setVisible(true);
 }
 
-   private void openMainApplication(String username) {
+   private void openMainApplication() {
       SwingUtilities.invokeLater(new Runnable() {
          @Override
          public void run() {
-            new CalendarApp(username); // Pass the username to CalendarApp
+            new CalendarApp();
          }
       });
    }
