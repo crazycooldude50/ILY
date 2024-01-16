@@ -7,10 +7,16 @@ import java.util.Map;
 import javax.swing.*;
 
 public class AuthenticationPanel extends JFrame {
-   private Map<String, String> userCredentials;
+   public Map<String, String> userCredentials;
+   public String currentUsername;
+   public Map<String, String> inputEventImp;
+   public Map<String, Map<String, String>> godMap;
 
    public AuthenticationPanel() {
       userCredentials = loadUserCredentials();
+      godMap = loadGodMap();
+      inputEventImp = loadInputEventImp();
+      currentUsername = "";
 
       setTitle("Sign Up / Login Panel");
       setSize(300, 150);
@@ -46,7 +52,7 @@ public class AuthenticationPanel extends JFrame {
    }
 
    private Map<String, String> loadUserCredentials() {
-      Map<String, String> credentials = new HashMap<>();
+      Map<String, String> credentials = new HashMap<>();      
 
       try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("user_credentials.dat"))) {
          credentials = (Map<String, String>) ois.readObject();
@@ -58,6 +64,34 @@ public class AuthenticationPanel extends JFrame {
 
       return credentials;
    }
+   
+   private Map<String, Map<String, String>> loadGodMap() {
+      Map<String, Map<String, String>> god = new HashMap<>();      
+
+      try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("god_map.dat"))) {
+         god = (Map<String, Map<String, String>>) ois.readObject();
+      } catch (FileNotFoundException e) {
+         // Handle file not found (first run)
+      } catch (IOException | ClassNotFoundException e) {
+         e.printStackTrace(); // Handle other exceptions
+      }
+
+      return god;
+   }
+   
+   private Map<String, String> loadInputEventImp() {
+      Map<String, String> input = new HashMap<>();      
+
+      try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("input_event_imp.dat"))) {
+         input = (Map<String, String>) ois.readObject();
+      } catch (FileNotFoundException e) {
+         // Handle file not found (first run)
+      } catch (IOException | ClassNotFoundException e) {
+         e.printStackTrace(); // Handle other exceptions
+      }
+
+      return input;
+   }
 
    private void saveUserCredentials() {
       try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("user_credentials.dat"))) {
@@ -65,6 +99,30 @@ public class AuthenticationPanel extends JFrame {
       } catch (IOException e) {
          e.printStackTrace(); // Handle the exception
       }
+   }
+   
+   private void saveGodMap() {
+      try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("god_map.dat"))) {
+         oos.writeObject(godMap);
+      } catch (IOException e) {
+         e.printStackTrace(); // Handle the exception
+      }
+   }
+   
+   private void saveInputEventImp() {
+      try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("input_event_imp.dat"))) {
+         oos.writeObject(inputEventImp);
+      } catch (IOException e) {
+         e.printStackTrace(); // Handle the exception
+      }
+   }
+   
+   private void massUpdate() {
+      godMap.put(currentUsername, inputEventImp);
+      System.out.println("Update GodMap: " + godMap);
+      System.out.println("Update usernames: " + currentUsername);
+      System.out.println("Update userCredentials: " + userCredentials);
+      
    }
 
   private void showSignUpDialog() {
@@ -89,11 +147,14 @@ public class AuthenticationPanel extends JFrame {
 
             if (!userCredentials.containsKey(username)) {
                 userCredentials.put(username, password);
+                currentUsername = username;
+                massUpdate();
                 saveUserCredentials(); // Save user credentials to file
+                saveGodMap();
+                saveInputEventImp();
                 JOptionPane.showMessageDialog(signUpFrame, "Sign Up Successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
-
-                // Log in the user immediately after signup
-                openMainApplication(username);
+//                 // Log in the user immediately after signup
+//                 openMainApplication(username);
 
                 signUpFrame.dispose(); // Close the sign-up frame
             } else {
@@ -132,8 +193,9 @@ private void showLoginDialog() {
             String password = new String(passwordChars);
 
             if (userCredentials.containsKey(username) && userCredentials.get(username).equals(password)) {
-                openMainApplication(username); // Pass the username to the main application
-                saveUserCredentials(); // Save user credentials to file after successful login
+                currentUsername = username;
+                massUpdate();
+                openMainApplication(); // Start calendar
                 loginFrame.dispose(); // Close the login frame
             } else {
                 JOptionPane.showMessageDialog(loginFrame, "Invalid username or password. Please try again.", "Error", JOptionPane.ERROR_MESSAGE);
