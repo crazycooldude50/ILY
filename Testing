@@ -1,0 +1,45 @@
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.*;
+import java.util.ArrayList;
+
+public class Testing {
+   public Map<String, String> userTesting;
+   public Map<ArrayList<String>, ArrayList<String>> userTesting2;
+   public Map<String, Map<ArrayList<String>, ArrayList<String>>> godMap;
+   public String current;
+   
+   public void update() {
+      Testing2 test2 = new Testing2();
+      userTesting = test2.userTesting3;
+      userTesting2 = test2.userTesting4;
+      godMap = test2.godMap2;
+      
+      System.out.println("new: " + godMap);
+   }
+   
+   public void massUpdate() {
+      Testing2 test2 = new Testing2();
+      userTesting = test2.userTesting3;
+      userTesting2 = test2.userTesting4;
+      godMap = test2.godMap2;
+   }
+   
+   public Testing() {
+   }
+   
+   public static void main(String[] args) {
+      massUpdate(); 
+      godMap = new HashMap<>();
+      userTesting = new HashMap<>();
+      current = "Aaron";
+      
+      userTesting.put(current, "Rhim");
+      godMap.put(current, userTesting2);
+
+   }
+}
