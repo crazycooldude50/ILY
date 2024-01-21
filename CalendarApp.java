@@ -15,8 +15,19 @@ import javax.swing.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import javax.swing.border.*;
+import java.util.ArrayList;
+
+/*
+   Now, the only thing you need to take is the currentUsername.
+   When you get that current username, then you need to trace 
+   into the godMap that has already been updated, and find all the
+   needed information :) easy. If contains that username, then you can
+   trace through the value and tada yes. You got the map all wrong
+*/
 
 public class CalendarApp extends JFrame {
+   private static CalendarApp instance;
+
    private JLabel monthLabel;
    private JPanel calendarPanel;
    private JPanel inputPanel;
@@ -31,7 +42,7 @@ public class CalendarApp extends JFrame {
    private int specifiedMonth;
 
    // amount of events in a day (Manual) (Bar Graph)
-   private Map<String, Integer> currentMap = new LinkedHashMap<>();
+   //private Map<String, Integer> currentMap = new LinkedHashMap<>();
    private Map<Integer, Integer> eventCountsPerManualDay = new LinkedHashMap<>();
 
    // Amount of events in a day (clicked) (show Events)
@@ -45,15 +56,67 @@ public class CalendarApp extends JFrame {
    // Calendar Setup
    private Calendar currentMonth;
    private String[] daysOfWeek = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
-
-   // User-specific data
-   private String username;
-   private Map<Integer, Set<String>> userEvents;
-
-   public CalendarApp(String username) {
-      this.username = username;
-      userEvents = loadUserData(); // Load user-specific data
    
+   // CAUTION
+   AuthenticationPanel a = new AuthenticationPanel();
+   private Map<String, String> userCredentialsCA;
+   private String currentUsernameCA;
+   private ArrayList<String> eventList = new ArrayList<>();
+   private Map<String, Map<Integer, ArrayList<String>>> godMapCA;
+   // eventDay: Day, events that day
+   private Map<Integer, ArrayList<String>> eventDay = new HashMap<>();
+   public int currentDay = 0;
+   
+   public Map<String, String> loadUserCredentialsCA() {
+      Map<String, String> credentials = new HashMap<>();      
+
+      try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("user_credentials.dat"))) {
+         credentials = (Map<String, String>) ois.readObject();
+      } catch (FileNotFoundException e) {
+         // Handle file not found (first run)
+      } catch (IOException | ClassNotFoundException e) {
+         e.printStackTrace(); // Handle other exceptions
+      }
+
+      return credentials;
+   }
+   
+   public Map<String, Map<Integer, ArrayList<String>>> loadGodMapCA() {
+      Map<String, Map<Integer, ArrayList<String>>> god = new HashMap<>();      
+
+      try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("god_map.dat"))) {
+         god = (Map<String, Map<Integer, ArrayList<String>>>) ois.readObject();
+      } catch (FileNotFoundException e) {
+         // Handle file not found (first run)
+      } catch (IOException | ClassNotFoundException e) {
+         e.printStackTrace(); // Handle other exceptions
+      }
+
+      return god;
+   }
+   
+   public void saveGodMap() {
+      try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("god_map.dat"))) {
+         oos.writeObject(godMapCA);
+      } catch (IOException e) {
+         e.printStackTrace(); // Handle the exception
+      }
+   }
+   
+   public int getSelectedDay() {
+      return currentDay;
+   }
+
+   public CalendarApp() {
+      AuthenticationPanel a = AuthenticationPanel.instance;
+      currentUsernameCA = a.getName();
+      System.out.println("I don't think it's working: " + currentUsernameCA);
+      // Start everything
+      godMapCA = loadGodMapCA();
+      godMapCA.forEach((key, value) -> {
+         eventDay = value;
+      });
+      
       currentMonth = Calendar.getInstance();
    
       setTitle("Java Calendar");
@@ -65,8 +128,6 @@ public class CalendarApp extends JFrame {
    
       setVisible(true);
    }
-
-
 
    private void createGUI() {
       Container container = getContentPane();
@@ -140,13 +201,12 @@ public class CalendarApp extends JFrame {
          new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-               saveUserData();
+               //massUpdate();
                JOptionPane.showMessageDialog(CalendarApp.this, "Data saved successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
             }
          });
    
       // Create buttons
-   
       buttonPanel.add(prevButton);
       buttonPanel.add(addButton);
       buttonPanel.add(barGraphButton);
@@ -281,17 +341,28 @@ public class CalendarApp extends JFrame {
 
    // Show Events :-)
    private void showEvents(int dayClicked) {
-      if (currentMap.containsValue(dayClicked)) { // Check if the day is present in currentMap
+      System.out.println("EventDay New: " + eventDay);
+      if (eventDay.containsKey(dayClicked)) { // Check if the day is present in currentMap
          ShowEvents eventsPanel = new ShowEvents(countEvents);
-      
-         for (Map.Entry<String, Integer> entry : currentMap.entrySet()) {
+         ArrayList<String> event = new ArrayList<String>();
+         Integer days = 0;
+ 
+         /*for (Map.Entry<Map<Integer, ArrayList<String>>> entry : eventDay.entrySet()) {
             Integer days = entry.getValue();
-            String event = entry.getKey();
+            ArrayList<String> event = new ArrayList<>();
+            event.add(entry.getKey());
          
             if (days == dayClicked) {
                eventsPanel.add(new JLabel(event));
             }
-         }
+         }*/
+         eventDay.forEach((key, value) -> {
+            if (key == dayClicked) {
+               for (String item : value) {
+                  eventsPanel.add(new JLabel(item));
+               }
+            }
+         });
          eventsPanel.setVisible(true);
       } else {
          JOptionPane.showMessageDialog(null, "There are no events for this day.");
@@ -354,8 +425,20 @@ public class CalendarApp extends JFrame {
             // Adding more and more
             barGraphInput = title.getText();
             specifiedDay = Integer.parseInt(day.getText());
-            currentMap.put(barGraphInput, specifiedDay);
+            //currentMap.put(barGraphInput, specifiedDay);
             eventCountsPerDay.put(specifiedDay, countEvents++);
+            
+            eventList.add(barGraphInput);
+            System.out.println(eventList);
+            currentDay = specifiedDay;
+            //Nested
+            eventDay.put(specifiedDay, eventList);
+            System.out.println("EventDay: " + eventDay);
+            //Big
+            godMapCA.put(currentUsernameCA, eventDay);
+            System.out.println("Current Username: " + currentUsernameCA);
+            saveGodMap();
+            System.out.println("Is this even working?" + godMapCA);
             try {
                specifiedMonth = Integer.parseInt(month.getText());
             } catch (NumberFormatException ex) {
@@ -378,67 +461,67 @@ public class CalendarApp extends JFrame {
             JOptionPane.showMessageDialog(null, "Event added successfully!");
          }
       
-         saveUserData();
+         //saveUserData();
       }
    }
 
- private Map<Integer, Set<String>> loadUserData() {
-    Map<Integer, Set<String>> userData = new HashMap<>();
-
-    try (BufferedReader reader = new BufferedReader(new FileReader(getUserDataFilePath()))) {
-        String line;
-        while ((line = reader.readLine()) != null) {
-            // Split the line into day and events
-            String[] parts = line.split("\\|");
-            int day = Integer.parseInt(parts[0]);
-            Set<String> events = new HashSet<>(Arrays.asList(parts[1].split(",")));
-
-            userData.put(day, events);
-        }
-    } catch (FileNotFoundException e) {
-        System.out.println("User data file not found. Creating a new file.");
-        saveUserData(); // Create a new empty file
-    } catch (IOException e) {
-        e.printStackTrace(); // Handle other exceptions
-    }
-
-    return userData;
-}
-
-
-// Add a method to get the user-specific data file path based on the username
-private String getUserDataFilePathForUsername() {
-    return "user_data_" + username + ".dat";
-}
-
-  private void saveUserData() {
-    try (BufferedWriter writer = new BufferedWriter(new FileWriter(getUserDataFilePath()))) {
-        // Save user-specific data to the file
-        for (Map.Entry<Integer, Set<String>> entry : userEvents.entrySet()) {
-            int day = entry.getKey();
-            Set<String> events = entry.getValue();
-
-            // Format: day|event1,event2,event3,...
-            String line = day + "|" + String.join(",", events);
-            writer.write(line);
-            writer.newLine();
-        }
-    } catch (IOException e) {
-        e.printStackTrace(); // Handle the exception
-    }
-}
-   private void updateCurrentMap(Map<Integer, Set<String>> userData) {
-      for (Set<String> events : userData.values()) {
-         for (String event : events) {
-            currentMap.put(event, specifiedDay); // Update currentMap based on loaded data
-         }
-      }
-   }
-
-   private String getUserDataFilePath() {
-      // Define the path to the file where user-specific data is stored
-      return "user_data_" + username + ".dat";
-   }
+//  private Map<Integer, Set<String>> loadUserData() {
+//     Map<Integer, Set<String>> userData = new HashMap<>();
+// 
+//     try (BufferedReader reader = new BufferedReader(new FileReader(getUserDataFilePath()))) {
+//         String line;
+//         while ((line = reader.readLine()) != null) {
+//             // Split the line into day and events
+//             String[] parts = line.split("\\|");
+//             int day = Integer.parseInt(parts[0]);
+//             Set<String> events = new HashSet<>(Arrays.asList(parts[1].split(",")));
+// 
+//             userData.put(day, events);
+//         }
+//     } catch (FileNotFoundException e) {
+//         System.out.println("User data file not found. Creating a new file.");
+//         saveUserData(); // Create a new empty file
+//     } catch (IOException e) {
+//         e.printStackTrace(); // Handle other exceptions
+//     }
+// 
+//     return userData;
+// }
+// 
+// 
+// // Add a method to get the user-specific data file path based on the username
+// private String getUserDataFilePathForUsername() {
+//     return "user_data_" + username + ".dat";
+// }
+// 
+//   private void saveUserData() {
+//     try (BufferedWriter writer = new BufferedWriter(new FileWriter(getUserDataFilePath()))) {
+//         // Save user-specific data to the file
+//         for (Map.Entry<Integer, Set<String>> entry : userEvents.entrySet()) {
+//             int day = entry.getKey();
+//             Set<String> events = entry.getValue();
+// 
+//             // Format: day|event1,event2,event3,...
+//             String line = day + "|" + String.join(",", events);
+//             writer.write(line);
+//             writer.newLine();
+//         }
+//     } catch (IOException e) {
+//         e.printStackTrace(); // Handle the exception
+//     }
+// }
+//    private void updateCurrentMap(Map<Integer, Set<String>> userData) {
+//       for (Set<String> events : userData.values()) {
+//          for (String event : events) {
+//             currentMap.put(event, specifiedDay); // Update currentMap based on loaded data
+//          }
+//       }
+//    }
+// 
+//    private String getUserDataFilePath() {
+//       // Define the path to the file where user-specific data is stored
+//       return "user_data_" + username + ".dat";
+//    }
 
    private void updateCalendar() {
       calendarPanel.removeAll();
