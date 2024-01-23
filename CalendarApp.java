@@ -422,10 +422,16 @@ public class CalendarApp extends JFrame {
             specifiedDay = Integer.parseInt(day.getText());
             //currentMap.put(barGraphInput, specifiedDay);
             eventCountsPerDay.put(specifiedDay, countEvents++);
-            
+            currentDay = specifiedDay;
+            eventDay.forEach((key, value) -> {
+               if (currentDay == key) {
+                  eventList = value;
+                  System.out.println("EventList: " + eventList);
+               }
+            });
             eventList.add(barGraphInput);
             System.out.println(eventList);
-            currentDay = specifiedDay;
+            
             //Nested
             eventDay.put(currentDay, eventList);
             System.out.println("EventDay: " + eventDay);
