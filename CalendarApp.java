@@ -115,8 +115,10 @@ public class CalendarApp extends JFrame {
       godMapCA = loadGodMapCA();
       System.out.println("godmap was just set yay" + godMapCA);
       godMapCA.forEach((key, value) -> {
-         eventDay = value;
-         System.out.println("eventday was just set yay" + eventDay);
+         if (key == currentUsernameCA) {
+            eventDay = value;
+            System.out.println("eventday was just set yay" + eventDay);
+         }
       });
       
       currentMonth = Calendar.getInstance();
