@@ -71,7 +71,7 @@ public class CalendarApp extends JFrame {
    private Map<Integer, ArrayList<String>> eventDay = new HashMap<>();
    // Event List
    private ArrayList<String> eventList = new ArrayList<>();
-
+   
    // instance
    private static int currentDay = 0;
 
@@ -252,11 +252,13 @@ public class CalendarApp extends JFrame {
             Collections.sort(entryList,
                 Comparator.comparingInt((Map.Entry<Integer, Integer> entry) -> entry.getKey()));
 
-            // Create a new LinkedHashMap with sorted entries
+            // Create a new LinkedHashMap with sorted entries, day, countEvents
             LinkedHashMap<Integer, Integer> sortedEventCountsPerDay2 = new LinkedHashMap<>();
-            for (Map.Entry<Integer, Integer> entry : entryList) {
-               sortedEventCountsPerDay2.put(entry.getKey(), entry.getValue());
-            }
+            eventDay.forEach((key, value) -> {
+               if (key == selectedDay) {
+                  sortedEventCountsPerDay2.put(selectedDay, value.size());
+               }
+            });
 
             // Pass the correct data (eventCountsPerDay) to the BarGraph constructor
             if (sortedEventCountsPerDay2.size() > 0) {
