@@ -16,107 +16,85 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import javax.swing.border.*;
 
-// CalendarApp Class
-public class CalendarApp extends JFrame {
-
-    // ... (existing code)
-
-    // Load user credentials from file
-    public Map<String, String> loadUserCredentialsCA() {
-        Map<String, String> credentials = new HashMap<>();
-
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("user_credentials.dat"))) {
-            credentials = (Map<String, String>) ois.readObject();
-        } catch (FileNotFoundException e) {
-            // Handle file not found (first run)
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace(); // Handle other exceptions
-        }
-
-        return credentials;
-    }
-
-    // Load god map from file
-    public Map<String, Map<Integer, ArrayList<String>>> loadGodMapCA() {
-        Map<String, Map<Integer, ArrayList<String>>> god = new HashMap<>();
-
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("god_map.dat"))) {
-            god = (Map<String, Map<Integer, ArrayList<String>>>) ois.readObject();
-        } catch (FileNotFoundException e) {
-            // Handle file not found (first run)
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace(); // Handle other exceptions
-        }
-
-        return god;
-    }
-
-    // Save god map to file
-    public void saveGodMap() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("god_map.dat"))) {
-            oos.writeObject(godMapCA);
-        } catch (IOException e) {
-            e.printStackTrace(); // Handle the exception
-        }
-    }
-
-    // Get selected day
-    public static int getSelectedDay() {
-        return currentDay;
-    }
-
-    // Create GUI components
-    private void createGUI() {
-        // ... (existing code)
-    }
-
-    // Update month label
-    private void updateMonthLabel() {
-        // ... (existing code)
-    }
-
-    // Bar Graph startup
-    private void openBarGraph() {
-        // ... (existing code)
-    }
-
-    // Update Bar Graph
-    private void updateBarGraph(int selectedDay) {
-        // ... (existing code)
-    }
-
-    // Show Events
-    private void showEventsCA(int dayClicked) {
-        // ... (existing code)
-    }
-
-    // Update Input for adding new events
-    private void updateInput() {
-        // ... (existing code)
-    }
-
-    // ... (existing code)
-
-}
-
-// ShowEvents Class
 public class ShowEvents extends JFrame {
-    // ... (existing code)
+   private ArrayList<String> events = new ArrayList<>();
+   private Map<String, Map<Integer, ArrayList<String>>> godMap;
+   private Map<Integer, ArrayList<String>> eventDay = new HashMap<>();
+   private String currentUsernameCA;
+   private int currentDayCA;
 
-    // Constructor
-    public ShowEvents(int count) {
-        // ... (existing code)
-    }
+   public ShowEvents(int count) {
+      setTitle("Events");
+      setSize(300, 200);
+      setLocationRelativeTo(null);
+        
+        //AuthenticationPanel a = AuthenticationPanel.instance;
+        //CalendarApp b = new CalendarApp();
+      currentUsernameCA = AuthenticationPanel.instance.getName();
+      currentDayCA = CalendarApp.getSelectedDay();
+      godMap = loadGodMap();
+        
+      godMap.forEach(
+         (key, value) -> {
+            System.out.println("Key in ShowEvents: " + key);
+            System.out.println("CurrentUsername in ShowEvents: " + currentUsernameCA);
+            if (key.equals(currentUsernameCA)) {
+               value.forEach(
+                  (key2, value2) -> {
+                     System.out.println("CurrentDay in ShowEvents: " + currentDayCA);
+                     if (key2.equals(currentDayCA)) { // Changed to key2.equals(currentDayCA)
+                        events = value2;
+                        System.out.println("From Show Events: " + godMap);
+                     }
+                  });
+            }
+         });
+                //loadEvents(); // Load events from file
+   
+      JPanel showEventsPanel = new JPanel(new GridLayout(count, 1));
+      setContentPane(showEventsPanel);
+        
+        
+        // Populate events from the loaded data
+      for (String event : events) {
+         showEventsPanel.add(new JLabel(event));
+      }
+   }
 
-    // Load god map from file
-    public Map<String, Map<Integer, ArrayList<String>>> loadGodMap() {
-        // ... (existing code)
-    }
+   public Map<String, Map<Integer, ArrayList<String>>> loadGodMap() {
+      Map<String, Map<Integer, ArrayList<String>>> god = new HashMap<>();
+      System.out.println("hiiii");
+      try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("god_map.dat"))) {
+         god = (Map<String, Map<Integer, ArrayList<String>>>) ois.readObject();
+         System.out.println("Successfully loaded godMap: " + god);
+      } catch (FileNotFoundException e) {
+         System.out.println("File not found: god_map.dat");
+        // Handle file not found (first run)
+      } catch (IOException | ClassNotFoundException e) {
+         e.printStackTrace(); // Handle other exceptions
+      }
+   
+      return god;
+   }
 
-    // Save god map to file
-    public void saveGodMap() {
-        // ... (existing code)
-    }
-
-    // ... (existing code)
+   
+   public void saveGodMap() {
+      try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("god_map.dat"))) {
+            // Update events for the current user
+         if (godMap.containsKey(currentUsernameCA)) {
+            Map<Integer, ArrayList<String>> userEvents = godMap.get(currentUsernameCA);
+            userEvents.put(currentDayCA, events);
+         } else {
+                // Create a new entry for the current user
+            Map<Integer, ArrayList<String>> newUserEvents = new HashMap<>();
+            newUserEvents.put(currentDayCA, events);
+            godMap.put(currentUsernameCA, newUserEvents);
+         }
+      
+            // Save the modified godMap to the file
+         oos.writeObject(godMap);
+      } catch (IOException e) {
+         e.printStackTrace(); // Handle the exception
+      }
+   }
 }
