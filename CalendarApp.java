@@ -1,18 +1,3 @@
-/* Hitaansh Jain, Aaron Rhim, Sandilya Parimi
-   Period 1
-   1/20/2024
-
-   This class constructs the main calendar interface using Swing. It is 
-   the main application for our project. Our main calendar app accurately 
-   displays the Gregorian Calendar. The current month, day, and date are 
-   accessed through the use of the java.util.calendar class and the 
-   java.time package. Using this, we were able to highlight the current 
-   date and match the dates with their respective day of the week. 
-   Through this main GUI, the user can create events on specific dates. 
-   Events may not be created on a prior date. Once a date has an event, 
-   the user can just click on it to see the event.​
-*/ 
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,6 +16,20 @@ import java.util.Map;
 import javax.swing.*;
 import javax.swing.border.*;
 
+/*
+   Aaron, Hitaansh, Sandy
+   1/24/2024
+
+   This class constructs the main calendar interface using Swing. It is 
+   the main application for our project. Our main calendar app accurately 
+   displays the Gregorian Calendar. The current month, day, and date are 
+   accessed through the use of the java.util.calendar class and the 
+   java.time package. Using this, we were able to highlight the current 
+   date and match the dates with their respective day of the week. 
+   Through this main GUI, the user can create events on specific dates. 
+   Events may not be created on a prior date. Once a date has an event, 
+   the user can just click on it to see the event.​
+*/
 
 public class CalendarApp extends JFrame {
    private JLabel monthLabel;
@@ -116,13 +115,14 @@ public class CalendarApp extends JFrame {
       godMapCA = loadGodMapCA();
 
       // condition (debugging)
-      if (eventDay != null) {
-         godMapCA.forEach((key, value) -> {
+      godMapCA.forEach((key, value) -> {
+         if (value != null) {
             if (key.equals(currentUsernameCA)) {
                eventDay = value;
             }
-         });
-      }
+         }
+      });
+      
 
       setTitle("Java Calendar");
       setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -302,13 +302,8 @@ public class CalendarApp extends JFrame {
 
    // Show Events
    private void showEventsCA(int dayClicked) {
-      // condition (debugging)
-      if (eventDay == null) {
-         JOptionPane.showMessageDialog(null, "There are no events for this day.");
-         updateCalendar();
-      }
       // click day output
-      else if (eventDay.containsKey(dayClicked)) {
+      if (eventDay.containsKey(dayClicked)) {
          ShowEvents eventsPanel = new ShowEvents(countEvents);
          ArrayList<String> event = new ArrayList<String>();
          Integer days = 0;
@@ -347,7 +342,7 @@ public class CalendarApp extends JFrame {
             currentDay = specifiedDay;
 
             // Condition (debugging)
-            if (eventDay != null) {
+            if (this.eventDay != null) {
                eventDay.forEach((key, value) -> {
                   if (currentDay == key) {
                      eventList = value;
