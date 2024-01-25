@@ -116,6 +116,7 @@ public class CalendarApp extends JFrame {
       System.out.println("I don't think it's working: " + currentUsernameCA);
       // Start everything
       godMapCA = loadGodMapCA();
+      System.out.print("EventDay Null: " + eventDay);
       System.out.println("godmap was just set yay" + godMapCA);
       /*godMapCA.forEach((key, value) -> {
          if (key.equals(currentUsernameCA)) {
@@ -127,12 +128,14 @@ public class CalendarApp extends JFrame {
             });            
          }
       });*/
+      if (eventDay != null) {
       godMapCA.forEach((key, value) -> {
          if (key.equals(currentUsernameCA)) {
             eventDay = value;
             System.out.println("eventDay: " + eventDay);
          }
       });
+      }
       
       currentMonth = Calendar.getInstance();
    
@@ -359,7 +362,11 @@ public class CalendarApp extends JFrame {
    // Show Events :-)
    private void showEventsCA(int dayClicked) {
       System.out.println("EventDay New: " + eventDay);
-      if (eventDay.containsKey(dayClicked)) { // Check if the day is present in currentMap
+      if (eventDay == null) {
+         JOptionPane.showMessageDialog(null, "There are no events for this day.");
+         updateCalendar();
+      }
+      else if (eventDay.containsKey(dayClicked)) { // Check if the day is present in currentMap
          ShowEvents eventsPanel = new ShowEvents(countEvents);
          ArrayList<String> event = new ArrayList<String>();
          Integer days = 0;
@@ -431,14 +438,18 @@ public class CalendarApp extends JFrame {
             //currentMap.put(barGraphInput, specifiedDay);
             eventCountsPerDay.put(specifiedDay, countEvents++);
             currentDay = specifiedDay;
+            
+            if (eventDay != null) {
             eventDay.forEach((key, value) -> {
                if (currentDay == key) {
                   eventList = value;
                   System.out.println("EventList: " + eventList);
                }
             });
+            }
+            
             eventList.add(barGraphInput);
-            System.out.println(eventList);
+            System.out.println("Event List: " + eventList);
             
             //Nested
             eventDay.put(currentDay, eventList);
