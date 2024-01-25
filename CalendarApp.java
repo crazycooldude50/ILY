@@ -525,7 +525,9 @@ public class CalendarApp extends JFrame {
    
       @Override
       public void actionPerformed(ActionEvent e) {
+         currentDay = day;
          showEventsCA(day);
+         
       }
    }
 
