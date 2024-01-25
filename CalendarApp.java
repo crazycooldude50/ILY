@@ -1,3 +1,13 @@
+/* Hitaansh Jain, Aaron Rhim, Sandilya Parimi
+   Period 1
+   1/20/2024
+
+   This class constructs the main calendar interface using Swing. It is the main application for our project. 
+   Our main calendar app accurately displays the Gregorian Calendar. 
+   The current month, day, and date are accessed through the use of the java.util.calendar class and the java.time package. Using this, we were able to highlight the current date and match the dates with their respective day of the week. 
+   Through this main GUI, the user can create events on specific dates. Events may not be created on a prior date. Once a date has an event, the user can just click on it to see the event.​
+*/ 
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,12 +26,6 @@ import java.util.Map;
 import javax.swing.*;
 import javax.swing.border.*;
 
-/*
-   Aaron, Hitaansh, Sandy
-   1/24/2024
-
-
-*/
 
 public class CalendarApp extends JFrame {
    private JLabel monthLabel;
