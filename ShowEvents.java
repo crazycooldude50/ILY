@@ -28,10 +28,10 @@ public class ShowEvents extends JFrame {
         setSize(300, 200);
         setLocationRelativeTo(null);
         
-        AuthenticationPanel a = AuthenticationPanel.instance;
-        CalendarApp b = new CalendarApp();
-        currentUsernameCA = a.getName();
-        currentDayCA = b.getSelectedDay();
+        //AuthenticationPanel a = AuthenticationPanel.instance;
+        //CalendarApp b = new CalendarApp();
+        currentUsernameCA = AuthenticationPanel.instance.getName();
+        currentDayCA = CalendarApp.getSelectedDay();
         godMap = loadGodMap();
         
         godMap.forEach((key, value) -> {
@@ -48,7 +48,8 @@ public class ShowEvents extends JFrame {
 
         JPanel showEventsPanel = new JPanel(new GridLayout(count, 1));
         setContentPane(showEventsPanel);
-
+        
+        
         // Populate events from the loaded data
         for (String event : events) {
             showEventsPanel.add(new JLabel(event));
