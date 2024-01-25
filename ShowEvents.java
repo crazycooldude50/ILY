@@ -35,8 +35,11 @@ public class ShowEvents extends JFrame {
         godMap = loadGodMap();
         
         godMap.forEach((key, value) -> {
+           System.out.println("Key in ShowEvents: " + key);
+           System.out.println("CurrentUsername in ShowEvents: " + currentUsernameCA);
            if (key.equals(currentUsernameCA)) {
                value.forEach((key2, value2) -> {
+               System.out.println("CurrentDay in ShowEvents: " + currentDayCA);
                   if (key2 == currentDayCA) {
                      events = value2;
                      System.out.println("From Show Events: " + godMap);
