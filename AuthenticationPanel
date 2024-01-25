@@ -13,6 +13,8 @@ public class AuthenticationPanel extends JFrame {
    
    private Map<String, String> userCredentials;
    private String currentUsername;
+   // Username -> (important events), (Day clicked, Corresponding events)
+   //private Map<String, Map<ArrayList<String>, Map<Integer, ArrayList<String>>>> godMap;
    private Map<String, Map<Integer, ArrayList<String>>> godMap;
 
    public AuthenticationPanel() {
@@ -174,6 +176,8 @@ private void showLoginDialog() {
             if (userCredentials.containsKey(username) && userCredentials.get(username).equals(password)) {
                 currentUsername = username;
                 System.out.println("Current Username from AP: " + currentUsername);
+                
+                saveGodMap();
                 instance.openMainApplication(); // Start calendar
                 loginFrame.dispose(); // Close the login frame
             } else {
