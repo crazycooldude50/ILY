@@ -60,10 +60,14 @@ public class CalendarApp extends JFrame {
    AuthenticationPanel a = new AuthenticationPanel();
    private Map<String, String> userCredentialsCA;
    private String currentUsernameCA;
-   private ArrayList<String> eventList = new ArrayList<>();
+   
+   //private Map<String, Map<ArrayList<String>, Map<Integer, ArrayList<String>>>> godMapCA;
    private Map<String, Map<Integer, ArrayList<String>>> godMapCA;
-   // eventDay: Day, events that day
+   private Map<ArrayList<String>, Map<Integer, ArrayList<String>>> lists = new HashMap<>();
+   private ArrayList<String> importantList = new ArrayList<>();
    private Map<Integer, ArrayList<String>> eventDay = new HashMap<>();
+   private ArrayList<String> eventList = new ArrayList<>();
+   
    private static int currentDay = 0;
    
    public Map<String, String> loadUserCredentialsCA() {
@@ -85,7 +89,6 @@ public class CalendarApp extends JFrame {
 
       try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("god_map.dat"))) {
          god = (Map<String, Map<Integer, ArrayList<String>>>) ois.readObject();
-         System.out.println("Why me: " + god);
       } catch (FileNotFoundException e) {
          // Handle file not found (first run)
       } catch (IOException | ClassNotFoundException e) {
@@ -114,10 +117,20 @@ public class CalendarApp extends JFrame {
       // Start everything
       godMapCA = loadGodMapCA();
       System.out.println("godmap was just set yay" + godMapCA);
+      /*godMapCA.forEach((key, value) -> {
+         if (key.equals(currentUsernameCA)) {
+            lists.forEach((key2, value2) -> {
+               importantList = key2;
+               eventDay = value;
+               System.out.println("eventDay: " + eventDay);
+               System.out.println("importantList: " + importantList);gi
+            });            
+         }
+      });*/
       godMapCA.forEach((key, value) -> {
-         if (key == currentUsernameCA) {
+         if (key.equals(currentUsernameCA)) {
             eventDay = value;
-            System.out.println("eventday was just set yay" + eventDay);
+            System.out.println("eventDay: " + eventDay);
          }
       });
       
@@ -351,13 +364,6 @@ public class CalendarApp extends JFrame {
          ArrayList<String> event = new ArrayList<String>();
          Integer days = 0;
          
-         eventDay.forEach((key, value) -> {
-            if (key == dayClicked) {
-               for (String item : value) {
-                  eventsPanel.add(new JLabel(item));
-               }
-            }
-         });
          eventsPanel.setVisible(true);
       } else {
          JOptionPane.showMessageDialog(null, "There are no events for this day.");
@@ -438,7 +444,7 @@ public class CalendarApp extends JFrame {
             eventDay.put(currentDay, eventList);
             System.out.println("EventDay: " + eventDay);
             //Big
-            godMapCA.put(currentUsernameCA, eventDay);
+            godMapCA.replace(currentUsernameCA, eventDay);
             System.out.println("Current Username: " + currentUsernameCA);
             saveGodMap();
             System.out.println("Is this even working?" + godMapCA);
