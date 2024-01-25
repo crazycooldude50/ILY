@@ -2,9 +2,11 @@
    Period 1
    1/20/2024
 
-   This class cosntructs a JFrame panel for the login and sign up. This is where new users can create an account and returning users can log in to find their saved events.
-   An account is required to access the application. 
-   User credentials are stored on a file on the user's computer, and they can make multiple accounts.
+   This class cosntructs a JFrame panel for the login and sign up. 
+   This is where new users can create an account and returning users 
+   can log in to find their saved events. An account is required to 
+   access the application. User credentials are stored on a file on 
+   the user's computer, and they can make multiple accounts.
 */
 
 import java.awt.*;
