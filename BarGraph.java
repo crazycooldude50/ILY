@@ -1,3 +1,12 @@
+/* Hitaansh Jain, Aaron Rhim, Sandilya Parimi
+   Period 1
+   1/20/2024
+
+   Once a user has stored at least one event, they can create a bar graph that visualizes the number of events per day for any specified week. 
+   This is extremely useful for looking at a week to see which days are busier or calmer. 
+   If there are no events in the specified week, the user will receive will a message letting them know, and the bar graph will not be constructed.
+*/
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.Calendar;
