@@ -18,11 +18,10 @@ import javax.swing.border.*;
 import java.util.ArrayList;
 
 /*
-   Now, the only thing you need to take is the currentUsername.
-   When you get that current username, then you need to trace
-   into the godMap that has already been updated, and find all the
-   needed information :) easy. If contains that username, then you can
-   trace through the value and tada yes. You got the map all wrong
+   Aaron, Hitaansh, Sandy
+   1/24/2024
+   
+   
 */
 
 public class CalendarApp extends JFrame {
@@ -41,7 +40,6 @@ public class CalendarApp extends JFrame {
     private int specifiedMonth;
 
     // amount of events in a day (Manual) (Bar Graph)
-    //private Map<String, Integer> currentMap = new LinkedHashMap<>();
     private Map<Integer, Integer> eventCountsPerManualDay = new LinkedHashMap<>();
 
     // Amount of events in a day (clicked) (show Events)
@@ -56,34 +54,22 @@ public class CalendarApp extends JFrame {
     private Calendar currentMonth;
     private String[] daysOfWeek = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 
-    // CAUTION
+    // Creating instances of Authentication Panel
     AuthenticationPanel a = new AuthenticationPanel();
     private Map<String, String> userCredentialsCA;
     private String currentUsernameCA;
 
-    //private Map<String, Map<ArrayList<String>, Map<Integer, ArrayList<String>>>> godMapCA;
+    // Username -> Day clicked, Event List
     private Map<String, Map<Integer, ArrayList<String>>> godMapCA;
-    private Map<ArrayList<String>, Map<Integer, ArrayList<String>>> lists = new HashMap<>();
-    private ArrayList<String> importantList = new ArrayList<>();
+    // Day clicked, Event List
     private Map<Integer, ArrayList<String>> eventDay = new HashMap<>();
+    // Event List
     private ArrayList<String> eventList = new ArrayList<>();
 
+    // instance
     private static int currentDay = 0;
-
-    public Map<String, String> loadUserCredentialsCA() {
-        Map<String, String> credentials = new HashMap<>();
-
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("user_credentials.dat"))) {
-            credentials = (Map<String, String>) ois.readObject();
-        } catch (FileNotFoundException e) {
-            // Handle file not found (first run)
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace(); // Handle other exceptions
-        }
-
-        return credentials;
-    }
-
+    
+    // God Map accessor
     public Map<String, Map<Integer, ArrayList<String>>> loadGodMapCA() {
         Map<String, Map<Integer, ArrayList<String>>> god = new HashMap<>();
 
@@ -98,6 +84,7 @@ public class CalendarApp extends JFrame {
         return god;
     }
 
+    // God Map mutator
     public void saveGodMap() {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("god_map.dat"))) {
             oos.writeObject(godMapCA);
@@ -106,28 +93,22 @@ public class CalendarApp extends JFrame {
         }
     }
 
+    // Day clicked accessor
     public static int getSelectedDay() {
         return currentDay;
     }
 
     public CalendarApp() {
+        currentMonth = Calendar.getInstance();
+        
+        // Authentication Panel instance
         AuthenticationPanel a = AuthenticationPanel.instance;
         currentUsernameCA = a.getName();
-        System.out.println("I don't think it's working: " + currentUsernameCA);
-        // Start everything
+        
+        // initialize godmap
         godMapCA = loadGodMapCA();
-        System.out.print("EventDay Null: " + eventDay);
-        System.out.println("godmap was just set yay" + godMapCA);
-      /*godMapCA.forEach((key, value) -> {
-         if (key.equals(currentUsernameCA)) {
-            lists.forEach((key2, value2) -> {
-               importantList = key2;
-               eventDay = value;
-               System.out.println("eventDay: " + eventDay);
-               System.out.println("importantList: " + importantList);gi
-            });
-         }
-      });*/
+        
+        // condition (debugging)
         if (eventDay != null) {
             godMapCA.forEach((key, value) -> {
                 if (key.equals(currentUsernameCA)) {
@@ -136,8 +117,6 @@ public class CalendarApp extends JFrame {
                 }
             });
         }
-
-        currentMonth = Calendar.getInstance();
 
         setTitle("Java Calendar");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -169,9 +148,7 @@ public class CalendarApp extends JFrame {
         JButton prevButton = new JButton("<< Prev");
         JButton addButton = new JButton("Add Event");
         JButton barGraphButton = new JButton("Bar Graph");
-        JButton importantButton = new JButton("Important Button");
         JButton nextButton = new JButton("Next >>");
-        JButton saveButton = new JButton("Save");
 
         // addActionListener click detection
         prevButton.addActionListener(
@@ -183,14 +160,6 @@ public class CalendarApp extends JFrame {
                         updateCalendar();
                     }
                 });
-
-      /*importantButton.addActionListener(
-         new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-               updateImportantEventsList();
-            }
-         });*/
 
         addButton.addActionListener(
                 new ActionListener() {
@@ -217,26 +186,15 @@ public class CalendarApp extends JFrame {
                         updateCalendar();
                     }
                 });
-        saveButton.addActionListener(
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        //massUpdate();
-                        JOptionPane.showMessageDialog(CalendarApp.this, "Data saved successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                    }
-                });
 
         // Create buttons
         buttonPanel.add(prevButton);
         buttonPanel.add(addButton);
         buttonPanel.add(barGraphButton);
-        buttonPanel.add(saveButton);
-        buttonPanel.add(importantButton);
         buttonPanel.add(nextButton);
         container.add(buttonPanel, BorderLayout.SOUTH);
     }
-
-
+    
     // Month Label
     private void updateMonthLabel() {
         SimpleDateFormat sdf = new SimpleDateFormat("MMMM yyyy");
@@ -298,8 +256,7 @@ public class CalendarApp extends JFrame {
                 }
                 System.out.println("Event Counts Per Day: " + sortedEventCountsPerDay2);
 
-                // Pass the correct data (eventCountsPerDay) to the BarGraph
-                // constructor
+                // Pass the correct data (eventCountsPerDay) to the BarGraph constructor
                 if (sortedEventCountsPerDay2.size() > 0) {
                     // Check if there is any key with a value greater than 0
                     boolean hasPositiveValue = sortedEventCountsPerDay2.values().stream().anyMatch(value -> value > 0);
@@ -340,33 +297,16 @@ public class CalendarApp extends JFrame {
             System.out.println("Day: " + day + ", Count: " + countCloudz);
         }
     }
-
-    // Important Events update call
-   /*private void updateImportantEventsList() {
-      if (countImp > 0) {
-         ShowImportant importantEventsText = new ShowImportant(countImp);
-
-         for (Map.Entry<String, Integer> entry : importantEventsMap.entrySet()) {
-            String event = entry.getKey();
-            Integer count = entry.getValue();
-            importantEventsText.add(new JLabel(event));
-         }
-
-         importantEventsText.setVisible(true);
-      } else {
-         JOptionPane.showMessageDialog(null, "There are no important events.");
-         updateCalendar();
-      }
-   }*/
-
-    // Show Events :-)
+    
+    // Show Events
     private void showEventsCA(int dayClicked) {
-        System.out.println("EventDay New: " + eventDay);
+        // condition (debugging)
         if (eventDay == null) {
             JOptionPane.showMessageDialog(null, "There are no events for this day.");
             updateCalendar();
         }
-        else if (eventDay.containsKey(dayClicked)) { // Check if the day is present in currentMap
+        // click day output
+        else if (eventDay.containsKey(dayClicked)) {
             ShowEvents eventsPanel = new ShowEvents(countEvents);
             ArrayList<String> event = new ArrayList<String>();
             Integer days = 0;
@@ -379,86 +319,47 @@ public class CalendarApp extends JFrame {
     }
 
     private void updateInput() {
+        // Add Event
         JTextField title = new JTextField();
         JTextField day = new JTextField();
         JTextField month = new JTextField();
 
-        JToggleButton allDay = new JToggleButton("False");
-        JToggleButton important = new JToggleButton("Not Important");
-
-        allDay.addActionListener(
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        if (allDay.isSelected()) {
-                            allDay.setText("True");
-                        } else {
-                            allDay.setText("False");
-                        }
-                    }
-                });
-
-        important.addActionListener(
-                new ActionListener() {
-                    int countTemp = countImp;
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        if (important.isSelected()) {
-                            important.setText("Important");
-                            countImp++;
-                        } else {
-                            important.setText("Not Important");
-                            countImp = countTemp;
-                        }
-                    }
-                });
-
-        JPanel inputPanel = new JPanel(new GridLayout(7, 2));
+        JPanel inputPanel = new JPanel(new GridLayout(3, 2));
         inputPanel.add(new JLabel("Day: "));
         inputPanel.add(day);
         inputPanel.add(new JLabel("Month: "));
         inputPanel.add(month);
         inputPanel.add(new JLabel("Title: "));
         inputPanel.add(title);
-        inputPanel.add(new JLabel("All-Day: "));
-        inputPanel.add(allDay);
-        inputPanel.add(new JLabel("Important: "));
-        inputPanel.add(important);
 
         int result = JOptionPane.showConfirmDialog(null, inputPanel, "New Event", JOptionPane.OK_CANCEL_OPTION);
 
         // !Null input check
         if (result == JOptionPane.OK_OPTION) {
-            System.out.println("OK OPTION");
             try {
-                System.out.println("Is anything happening bruh");
-                // Adding more and more
+                // Stacking
                 barGraphInput = title.getText();
                 specifiedDay = Integer.parseInt(day.getText());
-                //currentMap.put(barGraphInput, specifiedDay);
                 eventCountsPerDay.put(specifiedDay, countEvents++);
                 currentDay = specifiedDay;
 
+                // Condition (debugging)
                 if (eventDay != null) {
                     eventDay.forEach((key, value) -> {
                         if (currentDay == key) {
                             eventList = value;
-                            System.out.println("EventList: " + eventList);
                         }
                     });
                 }
 
+                // Array list of events, condition: day clicked
                 eventList.add(barGraphInput);
-                System.out.println("Event List: " + eventList);
 
-                //Nested
+                // Repair (debugging)
                 eventDay.put(currentDay, eventList);
-                System.out.println("EventDay: " + eventDay);
-                //Big
                 godMapCA.replace(currentUsernameCA, eventDay);
-                System.out.println("Current Username: " + currentUsernameCA);
                 saveGodMap();
-                System.out.println("Is this even working?" + godMapCA);
+                
                 try {
                     specifiedMonth = Integer.parseInt(month.getText());
                 } catch (NumberFormatException ex) {
@@ -477,7 +378,6 @@ public class CalendarApp extends JFrame {
                 updateCalendar();
             } else {
                 updateBarGraph(specifiedDay);
-                importantEventsMap.put(barGraphInput, countImp);
                 JOptionPane.showMessageDialog(null, "Event added successfully!");
             }
         }
@@ -495,10 +395,9 @@ public class CalendarApp extends JFrame {
         // Blank spaces for the first day of the month
         Calendar c = Calendar.getInstance();
         c.set(Calendar.DAY_OF_MONTH, 1);
-        System.out.println(c.getTime());
         String firstDay = c.getTime().toString().substring(0, 3);
-        System.out.println(firstDay);
         HashMap<String, Integer> days = new HashMap<>();
+        
         days.put("Sun", 1);
         days.put("Mon", 2);
         days.put("Tue", 3);
@@ -506,8 +405,10 @@ public class CalendarApp extends JFrame {
         days.put("Thu", 5);
         days.put("Fri", 6);
         days.put("Sat", 7);
+        
+        // formatting (debugging)
         int firstDayOfMonth = days.get(firstDay);
-        System.out.println(firstDayOfMonth);
+        
         for (int i = 1; i < firstDayOfMonth - 1; i++) {
             calendarPanel.add(new JLabel());
         }
@@ -527,6 +428,7 @@ public class CalendarApp extends JFrame {
         repaint();
     }
 
+    // day clicked
     private class DayButtonListener implements ActionListener {
         private int day;
 
@@ -537,29 +439,24 @@ public class CalendarApp extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             currentDay = day;
+            // working? (debugging)
             showEventsCA(day);
 
         }
     }
 
+    // Highlight gimmick (Sandy's only code)
     private void highlightCurrentDay() {
-        // Get current day
         int currentDay = LocalDate.now().getDayOfMonth();
-
-        // Get current month
         int currentMonth = LocalDate.now().getMonthValue();
-        // Check if current month matches calendar month
+        
         if (currentMonth == this.currentMonth.get(Calendar.MONTH) + 1) {
-            // Loop through calendar panel components
             for (Component component : calendarPanel.getComponents()) {
-                // Check if component is a day button
                 if (component instanceof JButton) {
                     JButton dayButton = (JButton) component;
 
-                    // Get day number from button text
                     int day = Integer.parseInt(dayButton.getText());
 
-                    // Highlight current day
                     if (day == currentDay) {
                         dayButton.setBackground(Color.YELLOW);
                         dayButton.setBorder(BorderFactory.createLoweredBevelBorder());
