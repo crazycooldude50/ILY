@@ -386,51 +386,40 @@ public class CalendarApp extends JFrame {
       }
    }
 
-   private void updateCalendar() {
-      calendarPanel.removeAll();
+  private void updateCalendar() {
+    calendarPanel.removeAll();
 
-      // Days of the week in one line at the top
-      for (String day : daysOfWeek) {
-         JLabel label = new JLabel(day, SwingConstants.CENTER);
-         calendarPanel.add(label);
-      }
+    // Days of the week in one line at the top
+    for (String day : daysOfWeek) {
+        JLabel label = new JLabel(day, SwingConstants.CENTER);
+        calendarPanel.add(label);
+    }
 
-      // Blank spaces for the first day of the month
-      Calendar c = Calendar.getInstance();
-      c.set(Calendar.DAY_OF_MONTH, 1);
-      String firstDay = c.getTime().toString().substring(0, 3);
-      HashMap<String, Integer> days = new HashMap<>();
+    // Blank spaces for the first day of the month
+    Calendar c = Calendar.getInstance();
+    c.set(Calendar.YEAR, currentMonth.get(Calendar.YEAR));
+    c.set(Calendar.MONTH, currentMonth.get(Calendar.MONTH));
+    c.set(Calendar.DAY_OF_MONTH, 1);
+    int firstDay = (c.get(Calendar.DAY_OF_WEEK) + 5) % 7; // Adjust for 0-based index
 
-      days.put("Sun", 1);
-      days.put("Mon", 2);
-      days.put("Tue", 3);
-      days.put("Wed", 4);
-      days.put("Thu", 5);
-      days.put("Fri", 6);
-      days.put("Sat", 7);
+    for (int i = 0; i < firstDay; i++) {
+        calendarPanel.add(new JLabel());
+    }
 
-      // formatting (debugging)
-      int firstDayOfMonth = days.get(firstDay);
+    // Days of the month
+    int maxDay = currentMonth.getActualMaximum(Calendar.DAY_OF_MONTH);
+    for (int i = 1; i <= maxDay; i++) {
+        JButton dayButton = new JButton(Integer.toString(i));
+        dayButton.addActionListener(new DayButtonListener(i));
 
-      for (int i = 1; i < firstDayOfMonth - 1; i++) {
-         calendarPanel.add(new JLabel());
-      }
+        calendarPanel.add(dayButton);
+    }
 
-      // Days of the month
-      int maxDay = currentMonth.getActualMaximum(Calendar.DAY_OF_MONTH);
-      for (int i = 1; i <= maxDay; i++) {
-         JButton dayButton = new JButton(Integer.toString(i));
-         dayButton.addActionListener(new DayButtonListener(i));
+    highlightCurrentDay();
 
-         calendarPanel.add(dayButton);
-      }
-
-      highlightCurrentDay();
-
-      revalidate();
-      repaint();
-   }
-
+    revalidate();
+    repaint();
+}
    // day clicked
    private class DayButtonListener implements ActionListener {
       private int day;
