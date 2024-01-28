@@ -1,12 +1,3 @@
-/* Hitaansh Jain, Aaron Rhim, Sandilya Parimi
-   Period 1
-   1/20/2024 
-
-   This class opens the events GUI when the user clicks on a day with an event. It utilizes a JFrame panel to do this.
-   This class stores the events on a file on the user's computer. 
-   It can also use that same file to access and load events that were created in a prior session.
-*/
-
 import java.util.List;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -24,6 +15,17 @@ import javax.swing.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import javax.swing.border.*;
+
+/* Aaron Rhim, Hitaansh Jain, Sandilya Parimi
+   Period 1
+   1/20/2024 
+
+   This class opens the events GUI when the user clicks on a day 
+   with an event. It utilizes a JFrame panel to do this. This class
+   stores the events on a file on the user's computer. It can also 
+   use that same file to access and load events that were created in 
+   a prior session.
+*/
 
 public class ShowEvents extends JFrame {
     private ArrayList<String> events = new ArrayList<>();
